@@ -40,12 +40,14 @@ def add_budget(update: Update, context: CallbackContext) -> None:
         print(msg)
         budget = int(msg)
         rc = c.execute(f"INSERT INTO BUDGET VALUES ({chat_id}, {budget})")
-        update.message.reply_text(f"Added {budget}!")
+        update.message.reply_text(f"Added ${budget}!")
     except ValueError:
-        print("Not value")
+        update.message.reply_text("Not a number...")
 
     conn.commit()
     conn.close
+
+# def update_budget():
 
 # def get_budget():
 #     bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.TYPING)
