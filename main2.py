@@ -99,7 +99,7 @@ def getMessage():
 @server.route("/")
 def webhook():
    bot.remove_webhook()
-   bot.set_webhook(url='https://git.heroku.com/fourteenthemoney.git'+ keys.API_KEY)
+   bot.set_webhook(url='https://fourteenthemoney.herokuapp.com/'+ keys.API_KEY)
    return "!", 200
 
 if __name__ == "__main__":
