@@ -1,8 +1,8 @@
 import telebot
 from telebot import types
-import sqlite3
 import Constants as keys
 import telegram
+import psycopg2
 
 bot = telebot.TeleBot(keys.API_KEY)
 
@@ -18,7 +18,12 @@ def add(message):
     bot.register_next_step_handler(msg, process_budget)
 
 def process_budget(message):
-    conn = sqlite3.connect('budgetDatabase.db')
+    conn = psycopg2.connect(
+        host="ec2-3-219-229-143.compute-1.amazonaws.com",
+        database="dacl3l363nbjcu",
+        user="dcthdqavgensio",
+        password="2f71fed74d2a555b9575615bfad5bf07d1f707f8ddac2391608f158bb7969c68"
+    )
     c = conn.cursor()
 
     username = message.from_user.id
@@ -32,8 +37,8 @@ def process_budget(message):
         global budget
         budget = float(separated[1])
 
-        c.execute(f"INSERT OR IGNORE INTO BUDGET (username) VALUES ({username})")
-        c.execute("INSERT INTO CATEGORY (category_name, budget, username) VALUES (?, ?, ?)", (category, budget, username))
+        c.execute(f"INSERT INTO BUDGET (username) VALUES ({username}) ON CONFLICT (username) DO NOTHING;")
+        c.execute("INSERT INTO CATEGORY (category_name, budget, username) VALUES (%s, %s, %s);", (category, budget, username))
         print("Added")
         bot.reply_to(message, f"Added ${budget:.2f} for {category}!")
 
