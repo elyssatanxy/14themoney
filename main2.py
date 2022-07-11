@@ -93,18 +93,18 @@ def view(message):
 
 @server.route('/' + keys.API_KEY, methods=['POST'])
 def getMessage():
-   bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
-   return "!", 200
+    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+    return "!", 200
 
 @server.route("/")
 def webhook():
-   bot.remove_webhook()
-   bot.set_webhook(url='https://fourteenthemoney.herokuapp.com/'+ keys.API_KEY)
-   return "!", 200
+    bot.remove_webhook()
+    bot.set_webhook(url='https://fourteenthemoney.herokuapp.com/'+ keys.API_KEY)
+    return "!", 200
 
 if __name__ == "__main__":
-   server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
+    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
+    bot.enable_save_next_step_handlers(delay=0)
+    bot.load_next_step_handlers()
 
-bot.enable_save_next_step_handlers(delay=0)
-bot.load_next_step_handlers()
-bot.infinity_polling()
+
