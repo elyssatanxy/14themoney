@@ -1,4 +1,6 @@
 python-dotenv
 telebot~=0.0.4
 PyTelegramBotAPI==4.6.0
-psycopg2
+psycopg2~=2.9.3
+Flask~=2.1.2
+requests==2.25.1

@@ -3,7 +3,10 @@ from telebot import types
 import Constants as keys
 import telegram
 import psycopg2
+import os
+from flask import Flask, request
 
+server = Flask(__name__)
 bot = telebot.TeleBot(keys.API_KEY)
 
 @bot.message_handler(commands=['start'])
@@ -87,6 +90,20 @@ def view(message):
 
     c.execute("SELECT * FROM CATEGORY WHERE username = ?", (username,))
     print(c.fetchone())
+
+@server.route('/' + keys.API_KEY, methods=['POST'])
+def getMessage():
+   bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+   return "!", 200
+
+@server.route("/")
+def webhook():
+   bot.remove_webhook()
+   bot.set_webhook(url='https://git.heroku.com/fourteenthemoney.git'+ keys.API_KEY)
+   return "!", 200
+
+if __name__ == "__main__":
+   server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
 
 bot.enable_save_next_step_handlers(delay=0)
 bot.load_next_step_handlers()
