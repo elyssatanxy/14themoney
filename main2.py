@@ -3,8 +3,11 @@ from telebot import types
 import sqlite3
 import Constants as keys
 import telegram
+from flask import Flask, request
+import os
 
 bot = telebot.TeleBot(keys.API_KEY)
+server = Flask(__name__)
 
 @bot.message_handler(commands=['start'])
 def welcome_message(message):
@@ -63,7 +66,6 @@ def update_budget(message):
     elif msg in "N":
         bot.reply_to(message, "Okay, no changes made!")
 
-
 @bot.message_handler(commands=['view'])
 def view(message):
     conn = sqlite3.connect('budgetDatabase.db')
@@ -76,4 +78,19 @@ def view(message):
 
 bot.enable_save_next_step_handlers(delay=0)
 bot.load_next_step_handlers()
-bot.infinity_polling()
+
+@server.route('/' + keys.API_KEY, methods=['POST'])
+def getMessage():
+    json_string = request.get_data().decode('utf-8')
+    update = telebot.types.Update.de_json(json_string)
+    bot.process_new_updates([update])
+    return "!", 200
+
+@server.route("/")
+def webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url='https://calm-savannah-80748.herokuapp.com/' + keys.API_KEY)
+    return "!", 200
+
+if __name__ == "__main__":
+    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
