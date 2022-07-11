@@ -46,7 +46,7 @@ def process_budget(message):
         conn.close
     except ValueError:
         bot.reply_to(message, "Not a number...")
-    except sqlite3.IntegrityError:
+    except psycopg2.IntegrityError:
         msg = bot.reply_to(message, "You have already created a budget for this category! Do you want to update the budget instead?\nType 'Y' to continue or 'N' to cancel")
         bot.register_next_step_handler(msg, update_budget)
     except IndexError:
@@ -55,7 +55,12 @@ def process_budget(message):
 def update_budget(message):
     msg = message.text.upper()
     if msg in "Y":
-        conn = sqlite3.connect('budgetDatabase.db')
+        conn = psycopg2.connect(
+            host="ec2-3-219-229-143.compute-1.amazonaws.com",
+            database="dacl3l363nbjcu",
+            user="dcthdqavgensio",
+            password="2f71fed74d2a555b9575615bfad5bf07d1f707f8ddac2391608f158bb7969c68"
+        )
         c = conn.cursor()
         username = message.from_user.id
         username = str(username)
@@ -70,7 +75,12 @@ def update_budget(message):
 
 @bot.message_handler(commands=['view'])
 def view(message):
-    conn = sqlite3.connect('budgetDatabase.db')
+    conn = psycopg2.connect(
+        host="ec2-3-219-229-143.compute-1.amazonaws.com",
+        database="dacl3l363nbjcu",
+        user="dcthdqavgensio",
+        password="2f71fed74d2a555b9575615bfad5bf07d1f707f8ddac2391608f158bb7969c68"
+    )
     c = conn.cursor()
     username = message.from_user.id
     username = str(username)
