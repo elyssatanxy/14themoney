@@ -1,7 +1,6 @@
 import telebot
 from telebot import types
 import Constants as keys
-import telegram
 import psycopg2
 import os
 from flask import Flask, request
