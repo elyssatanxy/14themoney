@@ -17,9 +17,7 @@ def welcome_message(message):
 
 @bot.message_handler(commands=['add'])
 def add(message):
-    msg = bot.send_message(message.chat.id,
-                           text="Okay! Enter your list of budgets (or just 1!) in this format:\ncategory1-budget1\ncategory2-budget2\n<b>(e.g. Food-200)</b>",
-                           parse_mode=telegram.ParseMode.HTML)
+    msg = bot.send_message(message.chat.id, "Okay! Enter your list of budgets (or just 1!) in this format:\ncategory1-budget1\ncategory2-budget2\n<b>(e.g. Food-200)</b>"L)
     bot.register_next_step_handler(msg, process_budget)
 
 
