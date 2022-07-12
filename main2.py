@@ -71,8 +71,8 @@ def process_budget(message):
     msg = message.text
     multilinecheck = msg.split(", ")
 
-    try:
-        for line in multilinecheck:
+    for line in multilinecheck:
+        try:
             separated = msg.split("-")
             global category
             category = separated[0]
@@ -87,17 +87,18 @@ def process_budget(message):
             if budget > 500:
                 bot.reply_to(message, "Eh... can spend so much meh? Got give money to your parents anot?")
 
-        conn.commit()
-        conn.close
-    except ValueError:
-        bot.reply_to(message, "Eh this one not a number leh... Don't anyhow!")
-    except psycopg2.IntegrityError:
-        msg = bot.reply_to(message,
+            conn.commit()
+            conn.close
+
+        except ValueError:
+            bot.reply_to(message, "Eh this one not a number leh... Don't anyhow!")
+        except psycopg2.IntegrityError:
+            msg = bot.reply_to(message,
                            f"Alamak... You already set a budget for {category} leh... You want update budget instead anot?\nType 'Y' for yas or 'N' for naur")
-        bot.register_next_step_handler(msg, update_budget)
-    except IndexError:
-        msg = bot.reply_to(message, "Huh? Wo bu ming bai... Try again please...")
-        bot.register_next_step_handler(msg, process_budget)
+            bot.register_next_step_handler(msg, update_budget)
+        except IndexError:
+            msg = bot.reply_to(message, "Huh? Wo bu ming bai... Try again please...")
+            bot.register_next_step_handler(msg, process_budget)
 
 
 def update_budget(message):
