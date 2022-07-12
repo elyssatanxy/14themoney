@@ -4,7 +4,13 @@ import Constants as keys
 import psycopg2
 
 bot = telebot.TeleBot(token=keys.API_KEY)
-
+conn = psycopg2.connect(
+    host="ec2-3-219-229-143.compute-1.amazonaws.com",
+    database="dacl3l363nbjcu",
+    user="dcthdqavgensio",
+    password="2f71fed74d2a555b9575615bfad5bf07d1f707f8ddac2391608f158bb7969c68"
+)
+c = conn.cursor()
 
 @bot.message_handler(commands=['start'])
 def welcome_message(message):
@@ -18,22 +24,16 @@ def help_message(message):
     bot.send_message(message.chat.id, "Come I tell you again:\n/add to add a new budget... any number also can\n/view to view your spending - hopefully got no negatives ah")
     bot.send_message(message.chat.id, "Still need help ah? Okay lor bopes... go find @elyssatanxy help you ba.")
 
-# @bot.message_handler(commands=['settings'])
-# def settings(message):
+@bot.message_handler(commands=['settings'])
+def settings(message):
+    bot.send_message(message.chat.id, "Okay come, how you want to set budget?")
+    bot.send_message(message.chat.id, "Send me 'W' for weekly and 'M' for monthly... Thank you ah.")
 
 
 @bot.message_handler(commands=['view'])
 def view(message):
     bot.send_message(message.chat.id, "Wah moment of truth...")
 
-    conn = psycopg2.connect(
-        host="ec2-3-219-229-143.compute-1.amazonaws.com",
-        database="dacl3l363nbjcu",
-        user="dcthdqavgensio",
-        password="2f71fed74d2a555b9575615bfad5bf07d1f707f8ddac2391608f158bb7969c68"
-    )
-
-    c = conn.cursor()
     username = message.from_user.id
     username = str(username)
 
@@ -41,13 +41,17 @@ def view(message):
     user_budgets = c.fetchall()
     all = ""
     list = 1
+    negativeflag = False;
 
     for row in user_budgets:
         all += f"{list}. Left ${row[1]} for {row[0]}\n"
         list += 1
+        if (row[1] < 0):
+            negativeflag = True;
 
     bot.send_message(message.chat.id, all)
-
+    if negativeflag:
+        bot.send_message(message.chat.id, "Aiya you overspend liao. Stop it ah!")
 
 @bot.message_handler(commands=['add'])
 def add(message):
@@ -58,24 +62,14 @@ def add(message):
 
 
 def process_budget(message):
-    conn = psycopg2.connect(
-        host="ec2-3-219-229-143.compute-1.amazonaws.com",
-        database="dacl3l363nbjcu",
-        user="dcthdqavgensio",
-        password="2f71fed74d2a555b9575615bfad5bf07d1f707f8ddac2391608f158bb7969c68"
-    )
-    c = conn.cursor()
-
     username = message.from_user.id
     username = str(username)
     msg = message.text
     multilinecheck = msg.split("\n")
-    print(multilinecheck)
 
     for line in multilinecheck:
         try:
             separated = line.split("-")
-            print(separated)
             global category
             category = separated[0]
             global budget
@@ -130,14 +124,6 @@ def spend(message):
 
 
 def process_spending(message):
-    conn = psycopg2.connect(
-        host="ec2-3-219-229-143.compute-1.amazonaws.com",
-        database="dacl3l363nbjcu",
-        user="dcthdqavgensio",
-        password="2f71fed74d2a555b9575615bfad5bf07d1f707f8ddac2391608f158bb7969c68"
-    )
-    c = conn.cursor()
-
     username = message.from_user.id
     username = str(username)
     msg = message.text
