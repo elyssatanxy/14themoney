@@ -12,6 +12,7 @@ conn = psycopg2.connect(
 )
 c = conn.cursor()
 
+
 @bot.message_handler(commands=['start'])
 def welcome_message(message):
     bot.send_message(message.chat.id, "Eh hello! Welcome to 14themoney!")
@@ -21,7 +22,7 @@ def welcome_message(message):
 @bot.message_handler(commands=['help'])
 def help_message(message):
     bot.send_message(message.chat.id, "No need so shy... Everybody needs help one.")
-    bot.send_message(message.chat.id, "Come I tell you again:\n/add to add a new budget... any number also can\n/view to view your spending - hopefully got no negatives ah")
+    bot.send_message(message.chat.id, "Come I tell you again:\n/add to add a new budget... any number also can\n/spend to track when you spend, but don't anyhow spam this one! later your money gone\n/view to view your spending - hopefully got no negatives ah\n/delete help you remove category... spend less save more\n/settings allow you switch between weekly and monthly tracking... very useful de!")
     bot.send_message(message.chat.id, "Still need help ah? Okay lor bopes... go find @elyssatanxy help you ba.")
 
 
@@ -67,6 +68,8 @@ def view(message):
     bot.send_message(message.chat.id, all)
     if negativeflag:
         bot.send_message(message.chat.id, "Aiya you overspend liao. Stop it ah!")
+    else:
+        bot.send_message(message.chat.id, "Wah still within budget leh! Good job ah.")
 
 
 @bot.message_handler(commands=['add'])
@@ -184,5 +187,6 @@ def process_delete(message):
 
     c.execute("DELETE FROM budget WHERE category_name = %s AND username = %s", (msg, username))
     bot.reply_to(message, "Can liao, delete for you already.")
+
 
 bot.infinity_polling()
