@@ -1,5 +1,4 @@
 import decimal
-import telegram
 import telebot
 import Constants as keys
 import psycopg2
@@ -18,6 +17,9 @@ def help_message(message):
     bot.send_message(message.chat.id, "No need so shy... Everybody needs help one.")
     bot.send_message(message.chat.id, "Come I tell you again:\n/add to add a new budget... any number also can\n/view to view your spending - hopefully got no negatives ah")
     bot.send_message(message.chat.id, "Still need help ah? Okay lor bopes... go find @elyssatanxy help you ba.")
+
+# @bot.message_handler(commands=['settings'])
+# def settings(message):
 
 
 @bot.message_handler(commands=['view'])
@@ -78,7 +80,6 @@ def process_budget(message):
         c.execute(f"INSERT INTO BUDGET (username) VALUES ({username}) ON CONFLICT (username) DO NOTHING;")
         c.execute("INSERT INTO CATEGORY (category_name, budget, username) VALUES (%s, %s, %s);",
                   (category, budget, username))
-        print("Added")
         bot.reply_to(message, f"Okay liao, added ${budget:.2f} for {category}! Don't overspend hor.")
 
         if budget > 500:
@@ -146,12 +147,13 @@ def process_spending(message):
         # checks if category exists
         data = []
         c.execute(f"SELECT COUNT(*) FROM CATEGORY WHERE category_name = {category} AND username = {username}", data)
+        if (c.fetchone() is not None):
+            print("help")
 
         c.execute("SELECT budget FROM CATEGORY WHERE category_name = %s AND username = %s", (category, username))
         budget = c.fetchone()[0]
         budget = budget - spent
         c.execute("UPDATE CATEGORY SET budget = %s WHERE category_name = %s AND username = %s;", (budget, category, username))
-        print("Deducted")
         bot.reply_to(message, f"Wah so much ah? Siao liao... Rest of the month eat grass liao lor. Left ${budget} for {category}.")
 
         if budget <= 0:
@@ -163,7 +165,7 @@ def process_spending(message):
         bot.reply_to(message, "Eh don't anyhow, type numbers la.")
     except IndexError:
         bot.reply_to(message, "Walao fella really anyhow... Type properly bro.")
-    except psycopg2.errors.UndefinedColumn:
-        bot.reply_to(message, "Sure you got create budget for this anot? /add first ba.")
+    # except psycopg2.errors.UndefinedColumn:
+    #     bot.reply_to(message, "Sure you got create budget for this anot? /add first ba.")
 
 bot.infinity_polling()
