@@ -69,21 +69,23 @@ def process_budget(message):
     username = message.from_user.id
     username = str(username)
     msg = message.text
+    multilinecheck = msg.split("\n")
 
     try:
-        separated = msg.split("-")
-        global category
-        category = separated[0]
-        global budget
-        budget = float(separated[1])
+        for line in multilinecheck:
+            separated = msg.split("-")
+            global category
+            category = separated[0]
+            global budget
+            budget = float(separated[1])
 
-        c.execute(f"INSERT INTO BUDGET (username) VALUES ({username}) ON CONFLICT (username) DO NOTHING;")
-        c.execute("INSERT INTO CATEGORY (category_name, budget, username) VALUES (%s, %s, %s);",
-                  (category, budget, username))
-        bot.reply_to(message, f"Okay liao, added ${budget:.2f} for {category}! Don't overspend hor.")
+            c.execute(f"INSERT INTO BUDGET (username) VALUES ({username}) ON CONFLICT (username) DO NOTHING;")
+            c.execute("INSERT INTO CATEGORY (category_name, budget, username) VALUES (%s, %s, %s);",
+                      (category, budget, username))
+            bot.reply_to(message, f"Okay liao, added ${budget:.2f} for {category}! Don't overspend hor.")
 
-        if budget > 500:
-            bot.reply_to(message, "Eh... can spend so much meh? Got give money to your parents anot?")
+            if budget > 500:
+                bot.reply_to(message, "Eh... can spend so much meh? Got give money to your parents anot?")
 
         conn.commit()
         conn.close
