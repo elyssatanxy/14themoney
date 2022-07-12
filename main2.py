@@ -15,7 +15,7 @@ c = conn.cursor()
 @bot.message_handler(commands=['start'])
 def welcome_message(message):
     bot.send_message(message.chat.id, "Eh hello! Welcome to 14themoney!")
-    bot.send_message(message.chat.id, "First time here ah? Come, I teach you how use.\n/add to add a new budget... any number also can\n/spend to track when you spend, but don't anyhow spam this one! later your money gone\n/view to view your spending - hopefully got no negatives ah\n/help if you need help lor, buey paiseh de")
+    bot.send_message(message.chat.id, "First time here ah? Come, I teach you how use.\n/add to add a new budget... any number also can\n/spend to track when you spend, but don't anyhow spam this one! later your money gone\n/view can view your spending - hopefully got no negatives ah\n/delete help you remove category... spend less save more\n/settings allow you switch between weekly and monthly tracking... very useful de!\n/help if you need help lor, buey paiseh de")
 
 
 @bot.message_handler(commands=['help'])
@@ -27,8 +27,17 @@ def help_message(message):
 @bot.message_handler(commands=['settings'])
 def settings(message):
     bot.send_message(message.chat.id, "Okay come, how you want to set budget?")
-    bot.send_message(message.chat.id, "Send me 'W' for weekly and 'M' for monthly... Thank you ah.")
+    msg = bot.send_message(message.chat.id, "Send me 'W' for weekly and 'M' for monthly... Thank you ah.")
+    bot.register_next_step_handler(msg, process_settings)
 
+def process_settings(message):
+    msg = message.text.upper()
+    if msg in "W":
+        bot.reply_to(message, "Swee! I help you change to weekly tracking liao.")
+    elif msg in "M":
+        bot.reply_to(message, "Solid ah, I change to monthly tracking for you le.")
+    else:
+        bot.reply_to(message, "Dont play play leh, I give you 2 options only...")
 
 @bot.message_handler(commands=['view'])
 def view(message):
@@ -123,6 +132,8 @@ def update_budget(message):
         conn.close
     elif msg in "N":
         bot.reply_to(message, "Can, I don't change anything lor.")
+    else:
+        bot.reply_to(message, "Don't test my patience hor, only got 2 choices...")
 
 
 @bot.message_handler(commands=['spend'])
@@ -164,8 +175,17 @@ def process_spending(message):
         c.execute("rollback")
 
 
-# @bot.message_handler(commands=['delete'])
-# def delete(message):
-#
+@bot.message_handler(commands=['delete'])
+def delete(message):
+    msg = bot.send_message(message.chat.id, "Okay lai, tell me which category you want delete?")
+    bot.register_next_step_handler(msg, process_delete)
+
+def process_delete(message):
+    username = message.from_user.id
+    username = str(username)
+    msg = message.text
+
+    c.execute("DELETE FROM CATEGORY WHERE category_name = %s AND username = %s", (msg, username))
+    bot.reply_to(message, "Can liao, delete for you already.")
 
 bot.infinity_polling()
