@@ -144,11 +144,6 @@ def process_spending(message):
         category = separated[0]
         spent = decimal.Decimal(separated[1])
 
-        # checks if category exists
-        c.execute(f"SELECT * FROM CATEGORY WHERE category_name = {category} AND username = {username}")
-        if (c.fetchone() is None):
-            raise ValueError
-
         c.execute("SELECT budget FROM CATEGORY WHERE category_name = '%s' AND username = '%s'", (category, username))
         budget = c.fetchone()[0]
         budget = budget - spent
