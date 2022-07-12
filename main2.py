@@ -1,12 +1,8 @@
 import telebot
-import telegram
-from telebot import types
 import Constants as keys
 import psycopg2
-import os
-from flask import Flask, request
 
-bot = telebot.TeleBot(keys.API_KEY)
+bot = telebot.TeleBot(token=keys.API_KEY)
 
 
 @bot.message_handler(commands=['start'])
@@ -17,7 +13,9 @@ def welcome_message(message):
 
 @bot.message_handler(commands=['add'])
 def add(message):
-    msg = bot.send_message(message.chat.id, "Okay! Enter your list of budgets (or just 1!) in this format:\ncategory1-budget1\ncategory2-budget2\n<b>(e.g. Food-200)</b>")
+    msg = bot.send_message(message.chat.id,
+                           text="Okay! Enter your list of budgets (or just 1!) in this format:\ncategory1-budget1\ncategory2-budget2\n<b>(e.g. Food-200)</b>",
+                           parse_mode='HTML')
     bot.register_next_step_handler(msg, process_budget)
 
 
