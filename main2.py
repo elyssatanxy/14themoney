@@ -150,7 +150,7 @@ def process_spending(message):
         if (c.fetchone() is not None):
             print("help")
 
-        c.execute("SELECT budget FROM CATEGORY WHERE category_name = %s AND username = %s", (category, username))
+        c.execute("SELECT budget FROM CATEGORY WHERE category_name = '%s' AND username = '%s'", (category, username))
         budget = c.fetchone()[0]
         budget = budget - spent
         c.execute("UPDATE CATEGORY SET budget = %s WHERE category_name = %s AND username = %s;", (budget, category, username))
