@@ -69,7 +69,7 @@ def process_budget(message):
     username = message.from_user.id
     username = str(username)
     msg = message.text
-    multilinecheck = msg.split(" ")
+    multilinecheck = msg.split(", ")
 
     try:
         for line in multilinecheck:
