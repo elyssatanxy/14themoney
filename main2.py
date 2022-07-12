@@ -49,6 +49,9 @@ def view(message):
         if (row[1] < 0):
             negativeflag = True;
 
+    conn.commit()
+    c.execute("rollback")
+    conn.close
     bot.send_message(message.chat.id, all)
     if negativeflag:
         bot.send_message(message.chat.id, "Aiya you overspend liao. Stop it ah!")
@@ -83,15 +86,19 @@ def process_budget(message):
                 bot.reply_to(message, "Eh... can spend so much meh? Got give money to your parents anot?")
 
             conn.commit()
+            c.execute("rollback")
             conn.close
         except ValueError:
             bot.reply_to(message, "Eh this one not a number leh... Don't anyhow!")
+            c.execute("rollback")
         except psycopg2.IntegrityError:
             msg = bot.reply_to(message,
                            f"Alamak... You already set a budget for {category} leh... You want update budget instead anot?\nType 'Y' for yas or 'N' for naur")
+            c.execute("rollback")
             bot.register_next_step_handler(msg, update_budget)
         except IndexError:
             msg = bot.reply_to(message, "Huh? Wo bu ming bai... Try again please...")
+            c.execute("rollback")
             bot.register_next_step_handler(msg, process_budget)
 
 
@@ -112,6 +119,7 @@ def update_budget(message):
         bot.reply_to(message, f"Okay liao, I updated budget for {category} to ${budget} already!")
 
         conn.commit()
+        c.execute("rollback")
         conn.close
     elif msg in "N":
         bot.reply_to(message, "Can, I don't change anything lor.")
@@ -143,12 +151,21 @@ def process_spending(message):
             bot.reply_to(message, "How can liddat... Next time no money buy house lor. Die liao.")
 
         conn.commit()
+        c.execute("rollback")
         conn.close
     except ValueError:
         bot.reply_to(message, "Eh don't anyhow, type numbers la.")
+        c.execute("rollback")
     except IndexError:
         bot.reply_to(message, "Walao fella really anyhow... Type properly bro.")
+        c.execute("rollback")
     except TypeError:
         bot.reply_to(message, "Sure you got create budget for this anot? /add first ba.")
+        c.execute("rollback")
+
+
+@bot.message_handler(commands=['delete'])
+def delete(message):
+
 
 bot.infinity_polling()
