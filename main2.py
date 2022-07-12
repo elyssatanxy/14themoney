@@ -161,9 +161,10 @@ def process_spending(message):
         conn.commit()
         conn.close
     except ValueError:
-        bot.reply_to(message, "Eh don't anyhow, type properly leh.")
+        bot.reply_to(message, "Eh don't anyhow, type numbers la.")
+    except IndexError:
+        bot.reply_to(message, "Walao fella really anyhow... Type properly bro.")
     except psycopg2.errors.UndefinedColumn:
         bot.reply_to(message, "Sure you got create budget for this anot? /add first ba.")
-
 
 bot.infinity_polling()
