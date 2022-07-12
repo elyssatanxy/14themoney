@@ -7,8 +7,15 @@ bot = telebot.TeleBot(token=keys.API_KEY)
 
 @bot.message_handler(commands=['start'])
 def welcome_message(message):
-    bot.send_message(message.chat.id, "Welcome to ONE FOR THE MONEY Telegram chat bot!")
-    bot.send_message(message.chat.id, "Commands list:\n/add to add a new budget\n/view to view your spending")
+    bot.send_message(message.chat.id, "Eh hello! Welcome to 14themoney!")
+    bot.send_message(message.chat.id, "First time here ah? Come, I teach you how use.\n/add to add a new budget... any number also can\n/view to view your spending - hopefully got no negatives ah\n/help if you need help lor, buey paiseh de")
+
+
+@bot.message_handler(commands=['help'])
+def welcome_message(message):
+    bot.send_message(message.chat.id, "No need so shy... Everybody needs help one.")
+    bot.send_message(message.chat.id, "Come I tell you again:\n/add to add a new budget... any number also can\n/view to view your spending - hopefully got no negatives ah")
+    bot.send_message(message.chat.id, "Still need help ah? Okay lor bopes... go find @elyssatanxy help you ba.")
 
 
 @bot.message_handler(commands=['add'])
