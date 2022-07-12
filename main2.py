@@ -18,10 +18,26 @@ def welcome_message(message):
     bot.send_message(message.chat.id, "Still need help ah? Okay lor bopes... go find @elyssatanxy help you ba.")
 
 
+@bot.message_handler(commands=['view'])
+def view(message):
+    conn = psycopg2.connect(
+        host="ec2-3-219-229-143.compute-1.amazonaws.com",
+        database="dacl3l363nbjcu",
+        user="dcthdqavgensio",
+        password="2f71fed74d2a555b9575615bfad5bf07d1f707f8ddac2391608f158bb7969c68"
+    )
+    c = conn.cursor()
+    username = message.from_user.id
+    username = str(username)
+
+    c.execute("SELECT * FROM CATEGORY WHERE username = ?", (username,))
+    print(c.fetchone())
+
+
 @bot.message_handler(commands=['add'])
 def add(message):
     msg = bot.send_message(message.chat.id,
-                           text="Okay! Enter your list of budgets (or just 1!) in this format:\ncategory1-budget1\ncategory2-budget2\n<b>(e.g. Food-200)</b>",
+                           text="Okay come, enter your budgets liddat:\ncategory1-budget1\ncategory2-budget2\n<b>(e.g. Food-200)</b>",
                            parse_mode='HTML')
     bot.register_next_step_handler(msg, process_budget)
 
@@ -50,18 +66,22 @@ def process_budget(message):
         c.execute("INSERT INTO CATEGORY (category_name, budget, username) VALUES (%s, %s, %s);",
                   (category, budget, username))
         print("Added")
-        bot.reply_to(message, f"Added ${budget:.2f} for {category}!")
+        bot.reply_to(message, f"Okay liao, added ${budget:.2f} for {category}! Don't overspend hor.")
+
+        if budget > 500:
+            bot.reply_to(message, "Eh... can spend so much meh? Got give money to your parents anot?")
 
         conn.commit()
         conn.close
     except ValueError:
-        bot.reply_to(message, "Not a number...")
+        bot.reply_to(message, "Eh this one not a number leh... Don't anyhow!")
     except psycopg2.IntegrityError:
         msg = bot.reply_to(message,
-                           "You have already created a budget for this category! Do you want to update the budget instead?\nType 'Y' to continue or 'N' to cancel")
+                           f"Alamak... You already set a budget for {category} leh... You want update budget instead anot?\nType 'Y' for yas or 'N' for naur")
         bot.register_next_step_handler(msg, update_budget)
     except IndexError:
-        bot.reply_to(message, "Didn't quite get that... Please try again.")
+        msg = bot.reply_to(message, "Huh? Wo bu ming bai... Try again please...")
+        bot.register_next_step_handler(msg, process_budget)
 
 
 def update_budget(message):
@@ -79,16 +99,21 @@ def update_budget(message):
 
         c.execute("UPDATE CATEGORY SET budget = ? WHERE category_name = ? AND username = ?",
                   (budget, category, username))
-        bot.reply_to(message, f"Okay, budget for {category} udpated to ${budget}!")
+        bot.reply_to(message, f"Okay liao, I updated budget for {category} to ${budget} already!")
 
         conn.commit()
         conn.close
     elif msg in "N":
-        bot.reply_to(message, "Okay, no changes made!")
+        bot.reply_to(message, "Can, I don't change anything lor.")
 
 
-@bot.message_handler(commands=['view'])
-def view(message):
+@bot.message_handler(commands=['spend'])
+def spend(message):
+    msg = bot.send_message(message.chat.id, "Aiyo spend money again... Sigh... How much now? Tell me like this ah:\ncategory1-amount")
+    bot.register_next_step_handler(msg, process_spending())
+
+
+def process_spending(message):
     conn = psycopg2.connect(
         host="ec2-3-219-229-143.compute-1.amazonaws.com",
         database="dacl3l363nbjcu",
@@ -96,11 +121,27 @@ def view(message):
         password="2f71fed74d2a555b9575615bfad5bf07d1f707f8ddac2391608f158bb7969c68"
     )
     c = conn.cursor()
+
     username = message.from_user.id
     username = str(username)
+    msg = message.text
 
-    c.execute("SELECT * FROM CATEGORY WHERE username = ?", (username,))
-    print(c.fetchone())
+    try:
+        separated = msg.split("-")
+        category = separated[0]
+        spent = float(separated[1])
+        c.execute("SELECT budget FROM CATEGORY WHERE category_name = %s AND username = %s", (category, username))
+        budget = c.fetchone()
+        budget = budget - spent
+        c.execute("UPDATE CATEGORY SET budget = %s WHERE category_name = %s AND username = %s;", (category, budget, username))
+        print("Deducted")
+        bot.reply_to(message, f"Wah so much ah? Siao liao... Rest of the month eat grass liao lor.")
 
+        if budget > 500:
+            bot.reply_to(message, "Eh... can spend so much meh? Got give money to your parents anot?")
 
+        conn.commit()
+        conn.close
+    except ValueError:
+        bot.reply_to(message, "Eh don't anyhow, type properly leh.")
 bot.infinity_polling()
