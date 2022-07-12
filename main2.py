@@ -164,8 +164,8 @@ def process_spending(message):
         c.execute("rollback")
 
 
-@bot.message_handler(commands=['delete'])
-def delete(message):
-
+# @bot.message_handler(commands=['delete'])
+# def delete(message):
+#
 
 bot.infinity_polling()
