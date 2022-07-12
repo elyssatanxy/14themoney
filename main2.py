@@ -24,11 +24,13 @@ def help_message(message):
     bot.send_message(message.chat.id, "Come I tell you again:\n/add to add a new budget... any number also can\n/view to view your spending - hopefully got no negatives ah")
     bot.send_message(message.chat.id, "Still need help ah? Okay lor bopes... go find @elyssatanxy help you ba.")
 
+
 @bot.message_handler(commands=['settings'])
 def settings(message):
     bot.send_message(message.chat.id, "Okay come, how you want to set budget?")
     msg = bot.send_message(message.chat.id, "Send me 'W' for weekly and 'M' for monthly... Thank you ah.")
     bot.register_next_step_handler(msg, process_settings)
+
 
 def process_settings(message):
     msg = message.text.upper()
@@ -39,6 +41,7 @@ def process_settings(message):
     else:
         bot.reply_to(message, "Dont play play leh, I give you 2 options only...")
 
+
 @bot.message_handler(commands=['view'])
 def view(message):
     bot.send_message(message.chat.id, "Wah moment of truth...")
@@ -46,17 +49,17 @@ def view(message):
     username = message.from_user.id
     username = str(username)
 
-    c.execute("SELECT * FROM CATEGORY WHERE username = %s", (username,))
+    c.execute("SELECT * FROM budget WHERE username = %s", (username,))
     user_budgets = c.fetchall()
     all = ""
     list = 1
     negativeflag = False;
 
     for row in user_budgets:
-        all += f"{list}. Left ${row[1]} for {row[0]}\n"
+        all += f"{list}. Left ${row[2]} for {row[1]}\n"
         list += 1
-        if (row[1] < 0):
-            negativeflag = True;
+        if row[1] < 0:
+            negativeflag = True
 
     conn.commit()
     c.execute("rollback")
@@ -64,6 +67,7 @@ def view(message):
     bot.send_message(message.chat.id, all)
     if negativeflag:
         bot.send_message(message.chat.id, "Aiya you overspend liao. Stop it ah!")
+
 
 @bot.message_handler(commands=['add'])
 def add(message):
@@ -87,8 +91,7 @@ def process_budget(message):
             global budget
             budget = float(separated[1])
 
-            c.execute(f"INSERT INTO BUDGET (username) VALUES ({username}) ON CONFLICT (username) DO NOTHING;")
-            c.execute("INSERT INTO CATEGORY (category_name, budget, username) VALUES (%s, %s, %s);", (category, budget, username))
+            c.execute("INSERT INTO budget (category_name, budget, username) VALUES (%s, %s, %s);", (category, budget, username))
             bot.reply_to(message, f"Okay liao, added ${budget:.2f} for {category}! Don't overspend hor.")
 
             if budget > 500:
@@ -114,17 +117,10 @@ def process_budget(message):
 def update_budget(message):
     msg = message.text.upper()
     if msg in "Y":
-        conn = psycopg2.connect(
-            host="ec2-3-219-229-143.compute-1.amazonaws.com",
-            database="dacl3l363nbjcu",
-            user="dcthdqavgensio",
-            password="2f71fed74d2a555b9575615bfad5bf07d1f707f8ddac2391608f158bb7969c68"
-        )
-        c = conn.cursor()
         username = message.from_user.id
         username = str(username)
 
-        c.execute("UPDATE CATEGORY SET budget = %s WHERE category_name = %s AND username = %s;", (budget, category, username))
+        c.execute("UPDATE budget SET budget = %s WHERE category_name = %s AND username = %s;", (budget, category, username))
         bot.reply_to(message, f"Okay liao, I updated budget for {category} to ${budget} already!")
 
         conn.commit()
@@ -152,10 +148,10 @@ def process_spending(message):
         category = separated[0]
         spent = decimal.Decimal(separated[1])
 
-        c.execute("SELECT budget FROM CATEGORY WHERE category_name = %s AND username = %s", (category, username))
+        c.execute("SELECT budget FROM budget WHERE category_name = %s AND username = %s", (category, username))
         budget = c.fetchone()[0]
         budget = budget - spent
-        c.execute("UPDATE CATEGORY SET budget = %s WHERE category_name = %s AND username = %s;", (budget, category, username))
+        c.execute("UPDATE budget SET budget = %s WHERE category_name = %s AND username = %s;", (budget, category, username))
         bot.reply_to(message, f"Wah so much ah? Siao liao... Rest of the month eat grass liao lor. Left ${budget} for {category}.")
 
         if budget <= 0:
@@ -180,12 +176,13 @@ def delete(message):
     msg = bot.send_message(message.chat.id, "Okay lai, tell me which category you want delete?")
     bot.register_next_step_handler(msg, process_delete)
 
+
 def process_delete(message):
     username = message.from_user.id
     username = str(username)
     msg = message.text
 
-    c.execute("DELETE FROM CATEGORY WHERE category_name = %s AND username = %s", (msg, username))
+    c.execute("DELETE FROM budget WHERE category_name = %s AND username = %s", (msg, username))
     bot.reply_to(message, "Can liao, delete for you already.")
 
 bot.infinity_polling()
