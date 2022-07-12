@@ -10,7 +10,7 @@ bot = telebot.TeleBot(token=keys.API_KEY)
 @bot.message_handler(commands=['start'])
 def welcome_message(message):
     bot.send_message(message.chat.id, "Eh hello! Welcome to 14themoney!")
-    bot.send_message(message.chat.id, "First time here ah? Come, I teach you how use.\n/add to add a new budget... any number also can\n/view to view your spending - hopefully got no negatives ah\n/help if you need help lor, buey paiseh de")
+    bot.send_message(message.chat.id, "First time here ah? Come, I teach you how use.\n/add to add a new budget... any number also can\n/spend to track when you spend, but don't anyhow spam this one! later your money gone\n/view to view your spending - hopefully got no negatives ah\n/help if you need help lor, buey paiseh de")
 
 
 @bot.message_handler(commands=['help'])
@@ -132,6 +132,11 @@ def process_spending(message):
         separated = msg.split("-")
         category = separated[0]
         spent = decimal.Decimal(separated[1])
+
+        # checks if category exists
+        data = []
+        c.execute(f"SELECT COUNT(*) FROM CATEGORY WHERE category_name = {category} AND username = {username}", data)
+
         c.execute("SELECT budget FROM CATEGORY WHERE category_name = %s AND username = %s", (category, username))
         budget = c.fetchone()[0]
         budget = budget - spent
@@ -146,7 +151,8 @@ def process_spending(message):
         conn.close
     except ValueError:
         bot.reply_to(message, "Eh don't anyhow, type properly leh.")
-    except psycopg2.IntegrityError:
+    except psycopg2.errors.UndefinedColumn:
         bot.reply_to(message, "Sure you got create budget for this anot? /add first ba.")
+
 
 bot.infinity_polling()
