@@ -144,7 +144,7 @@ def process_spending(message):
         category = separated[0]
         spent = decimal.Decimal(separated[1])
 
-        c.execute("SELECT budget FROM CATEGORY WHERE category_name = '%s' AND username = '%s'", (category, username))
+        c.execute("SELECT budget FROM CATEGORY WHERE category_name = %s AND username = %s", (category, username))
         budget = c.fetchone()[0]
         budget = budget - spent
         c.execute("UPDATE CATEGORY SET budget = %s WHERE category_name = %s AND username = %s;", (budget, category, username))
