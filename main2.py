@@ -58,7 +58,7 @@ def view(message):
     for row in user_budgets:
         all += f"{list}. Left ${row[2]} for {row[1]}\n"
         list += 1
-        if row[1] < 0:
+        if row[2] < 0:
             negativeflag = True
 
     conn.commit()
