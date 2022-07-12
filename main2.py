@@ -1,5 +1,5 @@
 import decimal
-
+import telegram
 import telebot
 import Constants as keys
 import psycopg2
@@ -14,7 +14,7 @@ def welcome_message(message):
 
 
 @bot.message_handler(commands=['help'])
-def welcome_message(message):
+def help_message(message):
     bot.send_message(message.chat.id, "No need so shy... Everybody needs help one.")
     bot.send_message(message.chat.id, "Come I tell you again:\n/add to add a new budget... any number also can\n/view to view your spending - hopefully got no negatives ah")
     bot.send_message(message.chat.id, "Still need help ah? Okay lor bopes... go find @elyssatanxy help you ba.")
@@ -22,18 +22,29 @@ def welcome_message(message):
 
 @bot.message_handler(commands=['view'])
 def view(message):
+    bot.send_message(message.chat.id, "Wah moment of truth...")
+
     conn = psycopg2.connect(
         host="ec2-3-219-229-143.compute-1.amazonaws.com",
         database="dacl3l363nbjcu",
         user="dcthdqavgensio",
         password="2f71fed74d2a555b9575615bfad5bf07d1f707f8ddac2391608f158bb7969c68"
     )
+
     c = conn.cursor()
     username = message.from_user.id
     username = str(username)
 
     c.execute("SELECT * FROM CATEGORY WHERE username = %s", (username,))
-    print(c.fetchone())
+    user_budgets = c.fetchall()
+    all = ""
+    list = 1
+
+    for row in user_budgets:
+        all += f"{list}. Left ${row[1]} for {row[0]}\n"
+        list += 1
+
+    bot.send_message(message.chat.id, all)
 
 
 @bot.message_handler(commands=['add'])
