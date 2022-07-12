@@ -1,3 +1,5 @@
+import decimal
+
 import telebot
 import Constants as keys
 import psycopg2
@@ -30,7 +32,7 @@ def view(message):
     username = message.from_user.id
     username = str(username)
 
-    c.execute("SELECT * FROM CATEGORY WHERE username = ?", (username,))
+    c.execute("SELECT * FROM CATEGORY WHERE username = %s", (username,))
     print(c.fetchone())
 
 
@@ -110,7 +112,7 @@ def update_budget(message):
 @bot.message_handler(commands=['spend'])
 def spend(message):
     msg = bot.send_message(message.chat.id, "Aiyo spend money again... Sigh... How much now? Tell me like this ah:\ncategory1-amount")
-    bot.register_next_step_handler(msg, process_spending())
+    bot.register_next_step_handler(msg, process_spending)
 
 
 def process_spending(message):
@@ -129,19 +131,22 @@ def process_spending(message):
     try:
         separated = msg.split("-")
         category = separated[0]
-        spent = float(separated[1])
+        spent = decimal.Decimal(separated[1])
         c.execute("SELECT budget FROM CATEGORY WHERE category_name = %s AND username = %s", (category, username))
-        budget = c.fetchone()
+        budget = c.fetchone()[0]
         budget = budget - spent
-        c.execute("UPDATE CATEGORY SET budget = %s WHERE category_name = %s AND username = %s;", (category, budget, username))
+        c.execute("UPDATE CATEGORY SET budget = %s WHERE category_name = %s AND username = %s;", (budget, category, username))
         print("Deducted")
-        bot.reply_to(message, f"Wah so much ah? Siao liao... Rest of the month eat grass liao lor.")
+        bot.reply_to(message, f"Wah so much ah? Siao liao... Rest of the month eat grass liao lor. Left ${budget} for {category}.")
 
-        if budget > 500:
-            bot.reply_to(message, "Eh... can spend so much meh? Got give money to your parents anot?")
+        if budget <= 0:
+            bot.reply_to(message, "How can liddat... Next time no money buy house lor. Die liao.")
 
         conn.commit()
         conn.close
     except ValueError:
         bot.reply_to(message, "Eh don't anyhow, type properly leh.")
+    except psycopg2.IntegrityError:
+        bot.reply_to(message, "Sure you got create budget for this anot? /add first ba.")
+
 bot.infinity_polling()
