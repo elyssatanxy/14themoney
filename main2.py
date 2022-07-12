@@ -110,8 +110,7 @@ def update_budget(message):
         username = message.from_user.id
         username = str(username)
 
-        c.execute("UPDATE CATEGORY SET budget = %s WHERE category_name = %s AND username = %s",
-                  (budget, category, username))
+        c.execute("UPDATE CATEGORY SET budget = %s WHERE category_name = %s AND username = %s;", (budget, category, username))
         bot.reply_to(message, f"Okay liao, I updated budget for {category} to ${budget} already!")
 
         conn.commit()
