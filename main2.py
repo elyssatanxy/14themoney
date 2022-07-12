@@ -69,19 +69,20 @@ def process_budget(message):
     username = message.from_user.id
     username = str(username)
     msg = message.text
-    multilinecheck = msg.split(", ")
+    multilinecheck = msg.split("\n")
+    print(multilinecheck)
 
     for line in multilinecheck:
         try:
-            separated = msg.split("-")
+            separated = line.split("-")
+            print(separated)
             global category
             category = separated[0]
             global budget
             budget = float(separated[1])
 
             c.execute(f"INSERT INTO BUDGET (username) VALUES ({username}) ON CONFLICT (username) DO NOTHING;")
-            c.execute("INSERT INTO CATEGORY (category_name, budget, username) VALUES (%s, %s, %s);",
-                      (category, budget, username))
+            c.execute("INSERT INTO CATEGORY (category_name, budget, username) VALUES (%s, %s, %s);", (category, budget, username))
             bot.reply_to(message, f"Okay liao, added ${budget:.2f} for {category}! Don't overspend hor.")
 
             if budget > 500:
@@ -89,7 +90,6 @@ def process_budget(message):
 
             conn.commit()
             conn.close
-
         except ValueError:
             bot.reply_to(message, "Eh this one not a number leh... Don't anyhow!")
         except psycopg2.IntegrityError:
