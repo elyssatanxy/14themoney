@@ -2,13 +2,23 @@ import decimal
 import telebot
 import Constants as keys
 import psycopg2
+import os
+import urllib.parse as urlparse
+
+url = urlparse.urlparse(os.environ['DATABASE_URL'])
+dbname = url.path[1:]
+user = url.username
+password = url.password
+host = url.hostname
+port = url.port
 
 bot = telebot.TeleBot(token=keys.API_KEY)
 conn = psycopg2.connect(
-    host="ec2-3-219-229-143.compute-1.amazonaws.com",
-    database="dacl3l363nbjcu",
-    user="dcthdqavgensio",
-    password="2f71fed74d2a555b9575615bfad5bf07d1f707f8ddac2391608f158bb7969c68"
+    dbname=dbname,
+    user=user,
+    password=password,
+    host=host,
+    port=port
 )
 c = conn.cursor()
 
