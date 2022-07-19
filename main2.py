@@ -64,7 +64,7 @@ def view(message):
     user_budgets = c.fetchall()
     all = ""
     list = 1
-    negativeflag = False;
+    negativeflag = False
 
     for row in user_budgets:
         all += f"{list}. Left ${row[2]} for {row[1]}\n"
@@ -76,6 +76,7 @@ def view(message):
     c.execute("rollback")
     conn.close
     bot.send_message(message.chat.id, all)
+
     if negativeflag:
         bot.send_message(message.chat.id, "Aiya you overspend liao. Stop it ah!")
     else:
