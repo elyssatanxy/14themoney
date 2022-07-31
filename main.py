@@ -112,7 +112,7 @@ def process_budget(message):
             spend = 0
             update_monthly = True
 
-            c.execute("INSERT INTO budget (category_name, budget, spend, username, update_monthly) VALUES (%s, %s, %s, %s. %s);", (category, budget, spend, username, update_monthly))
+            c.execute("INSERT INTO budget (category_name, budget, spend, username, update_monthly) VALUES (%s, %s, %s, %s, %s);", (category, budget, spend, username, update_monthly))
             bot.reply_to(message, f"Okay liao, added ${budget:.2f} for {category}! Don't overspend hor.")
 
             if budget > 500:
@@ -210,7 +210,7 @@ def process_reset(message):
 
         budget = c.fetchone()[0]
         bot.reply_to(message, f"Done. Your budget reset to ${budget} already!")
-    except TypeError:
+    except:
         bot.reply_to(message, "Hmm... cannot find the category leh. You /add already anot?")
         c.execute("rollback")
 
