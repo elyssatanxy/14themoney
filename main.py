@@ -201,6 +201,7 @@ def reset(message):
 
 def process_reset(message):
     username = message.from_user.id
+    username = str(username)
     category = message.text
     spent = 0
 
@@ -217,7 +218,8 @@ def process_reset(message):
 
 def monthly_job(message): 
     username = message.from_user.id
-    flag = c.execute("SELECT update_monthly FROM budget where username = %s", (username))
+    username = str(username)
+    flag = c.execute("SELECT update_monthly FROM budget where username = %s", (username,))
 
     if flag == True and date.today().day == 1:
         bot.send_message("New month liao. It's time to /reset!")
@@ -226,7 +228,8 @@ def monthly_job(message):
 
 def weekly_job(message):
     username = message.from_user.id
-    flag = c.execute("SELECT update_monthly FROM budget where username = %s", (username))
+    username = str(username)
+    flag = c.execute("SELECT update_monthly FROM budget where username = %s", (username,))
 
     if flag == False:
         bot.send_messaage("Time really flies... Monday blues begin again... Time for you to /reset your budget again.")
