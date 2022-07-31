@@ -5,7 +5,7 @@ import psycopg2
 import os
 import urllib.parse as urlparse
 from datetime import date
-from safe_schedule import SafeScheduler
+import schedule
 
 url = urlparse.urlparse(os.environ['DATABASE_URL'])
 dbname = url.path[1:]
@@ -232,9 +232,8 @@ def weekly_job(message):
         bot.send_messaage("Time really flies... Monday blues begin again... Time for you to /reset your budget again.")
 
 
-scheduler = SafeScheduler()
-scheduler.every().day.at("00:00").do(monthly_job)
-scheduler.every().monday.at("00:00").do(weekly_job)
+schedule.every().day.at("00:00").do(monthly_job)
+schedule.every().monday.at("00:00").do(weekly_job)
 
 
 @bot.message_handler(commands=['delete'])
