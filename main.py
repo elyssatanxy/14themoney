@@ -223,6 +223,7 @@ def process_reset(message):
         c.execute("rollback")
 
 
+@bot.message_handler(func=lambda m: True)
 def monthly_job(message): 
     username = message.from_user.id
     username = str(username)
@@ -237,6 +238,7 @@ def monthly_job(message):
         conn.close
 
 
+@bot.message_handler(func=lambda m: True)
 def weekly_job(message):
     username = message.from_user.id
     username = str(username)
@@ -273,7 +275,7 @@ def process_delete(message):
 
 bot.infinity_polling()
 schedule.every().day.at("00:09").do(monthly_job)
-schedule.every().monday.at("03:40").do(weekly_job)
+schedule.every().monday.at("03:50").do(weekly_job)
 
 while True:
     schedule.run_pending()
