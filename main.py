@@ -273,10 +273,15 @@ def process_delete(message):
     bot.reply_to(message, "Can liao, delete for you already.")
 
 
-bot.infinity_polling()
-schedule.every().day.at("00:09").do(monthly_job)
-schedule.every().monday.at("03:50").do(weekly_job)
+def schedule():
+    schedule.every().day.at("00:09").do(monthly_job)
+    schedule.every().monday.at("03:55").do(weekly_job)
 
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+
+if __name__ == '__main__':
+    bot.infinity_polling()
+    schedule()
