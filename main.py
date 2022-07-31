@@ -4,6 +4,8 @@ import Constants as keys
 import psycopg2
 import os
 import urllib.parse as urlparse
+from datetime import date
+from safe_schedule import SafeScheduler
 
 url = urlparse.urlparse(os.environ['DATABASE_URL'])
 dbname = url.path[1:]
@@ -44,10 +46,13 @@ def settings(message):
 
 
 def process_settings(message):
+    username = message.from_user.id
     msg = message.text.upper()
     if msg in "W":
+        c.execute("UPDATE budget SET update_monthly = False WHERE username = %s", (username))
         bot.reply_to(message, "Swee! I help you change to weekly tracking liao.")
     elif msg in "M":
+        c.execute("UPDATE budget SET update_monthly = True WHERE username = %s", (username))
         bot.reply_to(message, "Solid ah, I change to monthly tracking for you le.")
     else:
         bot.reply_to(message, "Dont play play leh, I give you 2 options only...")
@@ -104,8 +109,10 @@ def process_budget(message):
             category = separated[0]
             global budget
             budget = float(separated[1])
+            spend = 0
+            update_monthly = True
 
-            c.execute("INSERT INTO budget (category_name, budget, username) VALUES (%s, %s, %s);", (category, budget, username))
+            c.execute("INSERT INTO budget (category_name, budget, spend, username, update_monthly) VALUES (%s, %s, %s, %s. %s);", (category, budget, spend, username, update_monthly))
             bot.reply_to(message, f"Okay liao, added ${budget:.2f} for {category}! Don't overspend hor.")
 
             if budget > 500:
@@ -160,13 +167,14 @@ def process_spending(message):
     try:
         separated = msg.split("-")
         category = separated[0]
-        spent = decimal.Decimal(separated[1])
+        spend = decimal.Decimal(separated[1])
+
+        c.execute("UPDATE budget SET spend = %s WHERE category_name = %s AND username = %s;", (spend, category, username))
 
         c.execute("SELECT budget FROM budget WHERE category_name = %s AND username = %s", (category, username))
         budget = c.fetchone()[0]
-        budget = budget - spent
-        c.execute("UPDATE budget SET budget = %s WHERE category_name = %s AND username = %s;", (budget, category, username))
-        bot.reply_to(message, f"Wah so much ah? Siao liao... Rest of the month eat grass liao lor. Left ${budget} for {category}.")
+        remainder = budget - spend
+        bot.reply_to(message, f"Wah so much ah? Siao liao... Rest of the month eat grass liao lor. Spent ${spend}, so now left ${remainder} for {category}.")
 
         if budget <= 0:
             bot.reply_to(message, "How can liddat... Next time no money buy house lor. Die liao.")
@@ -183,6 +191,50 @@ def process_spending(message):
     except TypeError:
         bot.reply_to(message, "Sure you got create budget for this anot? /add first ba.")
         c.execute("rollback")
+
+
+@bot.message_handler(commands=['reset'])
+def reset(message):
+    msg = bot.send_message(message.chat.id, "Okay lai, tell me which budget category you want to reset.\nReset means that it goes back to the original amount hor.")
+    bot.register_next_step_handler(msg, process_reset)
+
+
+def process_reset(message):
+    username = message.from_user.id
+    category = message.text
+    spent = 0
+
+    try:
+        c.execute("UPDATE budget SET spent = %s WHERE category_name = %s and username = %s", (spent, category, username))
+        c.execute("SELECT budget FROM budget WHERE category_name = %s AND username = %s", (category, username))
+
+        budget = c.fetchone()[0]
+        bot.reply_to(message, f"Done. Your budget reset to ${budget} already!")
+    except TypeError:
+        bot.reply_to(message, "Hmm... cannot find the category leh. You /add already anot?")
+        c.execute("rollback")
+
+
+def monthly_job(message): 
+    username = message.from_user.id
+    flag = c.execute("SELECT update_monthly FROM budget where username = %s", (username))
+
+    if flag == True and date.today().day == 1:
+        bot.send_message("New month liao. It's time to /reset!")
+
+
+
+def weekly_job(message):
+    username = message.from_user.id
+    flag = c.execute("SELECT update_monthly FROM budget where username = %s", (username))
+
+    if flag == False:
+        bot.send_messaage("Time really flies... Monday blues begin again... Time for you to /reset your budget again.")
+
+
+scheduler = SafeScheduler()
+scheduler.every().day.at("00:00").do(monthly_job)
+scheduler.every().monday.at("00:00").do(weekly_job)
 
 
 @bot.message_handler(commands=['delete'])
