@@ -1,4 +1,5 @@
 import decimal
+from math import remainder
 import telebot
 import Constants as keys
 import psycopg2
@@ -72,7 +73,8 @@ def view(message):
     negativeflag = False
 
     for row in user_budgets:
-        all += f"{list}. Left ${row[2]} for {row[1]}\n"
+        remainder = row[2] - row[3]
+        all += f"{list}. Left ${remainder} for {row[1]}\n"
         list += 1
         if row[2] < 0:
             negativeflag = True
@@ -203,10 +205,10 @@ def process_reset(message):
     username = message.from_user.id
     username = str(username)
     category = message.text
-    spent = 0
+    spend = 0
 
     try:
-        c.execute("UPDATE budget SET spent = %s WHERE category_name = %s and username = %s", (spent, category, username))
+        c.execute("UPDATE budget SET spend = %s WHERE category_name = %s and username = %s", (spend, category, username))
         conn.commit()
         c.execute("rollback")
         conn.close
