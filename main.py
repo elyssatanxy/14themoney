@@ -206,9 +206,9 @@ def process_reset(message):
 
     try:
         c.execute("UPDATE budget SET spent = %s WHERE category_name = %s and username = %s", (spent, category, username))
-        c.execute("SELECT budget FROM budget WHERE category_name = %s AND username = %s", (category, username))
-
-        budget = c.fetchone()[0]
+        conn.commit()
+        c.execute("rollback")
+        conn.close
         bot.reply_to(message, f"Done. Your budget reset to ${budget} already!")
     except:
         bot.reply_to(message, "Hmm... cannot find the category leh. You /add already anot?")
@@ -248,6 +248,9 @@ def process_delete(message):
     msg = message.text
 
     c.execute("DELETE FROM budget WHERE category_name = %s AND username = %s", (msg, username))
+    conn.commit()
+    c.execute("rollback")
+    conn.close
     bot.reply_to(message, "Can liao, delete for you already.")
 
 
