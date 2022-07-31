@@ -48,6 +48,7 @@ def settings(message):
 
 def process_settings(message):
     username = message.from_user.id
+    username = str(username)
     msg = message.text.upper()
     if msg in "W":
         c.execute("UPDATE budget SET update_monthly = False WHERE username = %s", (username,))
@@ -213,7 +214,7 @@ def process_reset(message):
         c.execute("SELECT budget FROM budget WHERE category_name = %s AND username = %s", (category, username))
         budget = c.fetchone()[0]
         bot.reply_to(message, f"Done. Your budget reset to ${budget} already!")
-        
+
         conn.commit()
         c.execute("rollback")
         conn.close
