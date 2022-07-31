@@ -226,18 +226,19 @@ def process_reset(message):
 def monthly_job(message): 
     username = message.from_user.id
     username = str(username)
-    flag = c.execute("SELECT update_monthly FROM budget where username = %s", (username,))
+    c.execute("SELECT update_monthly FROM budget where username = %s", (username,))
+    flag = c.fetchone()[0]
 
     if flag == True and date.today().day == 1:
         c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, username))
         bot.send_message("New month new budget! I have reset all your budgets already!")
 
 
-
 def weekly_job(message):
     username = message.from_user.id
     username = str(username)
-    flag = c.execute("SELECT update_monthly FROM budget where username = %s", (username,))
+    c.execute("SELECT update_monthly FROM budget where username = %s", (username,))
+    flag = c.fetchone()[0]
     spend = 0
 
     if flag == False:
@@ -245,8 +246,8 @@ def weekly_job(message):
         bot.send_messaage("Time really flies... Monday blues again... I make it less blue by resetting your budget ba.")
 
 
-schedule.every().day.at("00:07").do(monthly_job)
-schedule.every().monday.at("00:04").do(weekly_job)
+schedule.every().day.at("00:09").do(monthly_job)
+schedule.every().monday.at("00:07").do(weekly_job)
 
 
 @bot.message_handler(commands=['delete'])
