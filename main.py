@@ -210,7 +210,7 @@ def process_reset(message):
         c.execute("rollback")
         conn.close
         bot.reply_to(message, f"Done. Your budget reset to ${budget} already!")
-    except:
+    except TypeError:
         bot.reply_to(message, "Hmm... cannot find the category leh. You /add already anot?")
         c.execute("rollback")
 
