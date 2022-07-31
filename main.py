@@ -5,7 +5,7 @@ import Constants as keys
 import psycopg2
 import os
 import urllib.parse as urlparse
-from datetime import date
+from datetime import date, time
 import schedule
 
 url = urlparse.urlparse(os.environ['DATABASE_URL'])
@@ -232,6 +232,9 @@ def monthly_job(message):
     if flag == True and date.today().day == 1:
         c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, username))
         bot.send_message("New month new budget! I have reset all your budgets already!")
+        conn.commit()
+        c.execute("rollback")
+        conn.close
 
 
 def weekly_job(message):
@@ -239,15 +242,15 @@ def weekly_job(message):
     username = str(username)
     c.execute("SELECT update_monthly FROM budget where username = %s", (username,))
     flag = c.fetchone()[0]
+    
     spend = 0
 
     if flag == False:
         c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, username))
         bot.send_messaage("Time really flies... Monday blues again... I make it less blue by resetting your budget ba.")
-
-
-schedule.every().day.at("00:09").do(monthly_job)
-schedule.every().monday.at("00:07").do(weekly_job)
+        conn.commit()
+        c.execute("rollback")
+        conn.close
 
 
 @bot.message_handler(commands=['delete'])
@@ -269,3 +272,9 @@ def process_delete(message):
 
 
 bot.infinity_polling()
+schedule.every().day.at("00:09").do(monthly_job)
+schedule.every().monday.at("03:40").do(weekly_job)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
