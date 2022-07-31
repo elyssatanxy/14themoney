@@ -1,11 +1,13 @@
 import decimal
 from math import remainder
+from threading import Thread
+from time import sleep
 import telebot
 import Constants as keys
 import psycopg2
 import os
 import urllib.parse as urlparse
-from datetime import date, time
+from datetime import date
 import schedule
 
 url = urlparse.urlparse(os.environ['DATABASE_URL'])
@@ -273,15 +275,15 @@ def process_delete(message):
     bot.reply_to(message, "Can liao, delete for you already.")
 
 
-def schedule():
-    schedule.every().day.at("00:09").do(monthly_job)
-    schedule.every().monday.at("03:55").do(weekly_job)
-
+def schedule_checker():
     while True:
         schedule.run_pending()
-        time.sleep(1)
+        sleep(1)
 
 
 if __name__ == '__main__':
     bot.infinity_polling()
+    schedule.every().day.at("00:09").do(monthly_job)
+    schedule.every().monday.at("04:00").do(weekly_job)
+    Thread(target=schedule_checker).start() 
     schedule()
