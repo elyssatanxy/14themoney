@@ -29,13 +29,13 @@ c = conn.cursor()
 @bot.message_handler(commands=['start'])
 def welcome_message(message):
     bot.send_message(message.chat.id, "Eh hello! Welcome to 14themoney!")
-    bot.send_message(message.chat.id, "First time here ah? Come, I teach you how use.\n/add to add a new budget... any number also can\n/spend to track when you spend, but don't anyhow spam this one! later your money gone\n/view can view your spending - hopefully got no negatives ah\n/delete help you remove category... spend less save more\n/settings allow you switch between weekly and monthly tracking... very useful de!\n/help if you need help lor, buey paiseh de")
+    bot.send_message(message.chat.id, "First time here ah? Come, I teach you how use.\n/add to add a new budget... any number also can\n/spend to track when you spend, but don't anyhow spam this one! later your money gone\n/view can view your spending - hopefully got no negatives ah\n/delete help you remove category... spend less save more\n/settings allow you switch between weekly and monthly tracking... very useful de!\n/reset to manually reset your budget ba\n/help if you need help lor, buey paiseh de")
 
 
 @bot.message_handler(commands=['help'])
 def help_message(message):
     bot.send_message(message.chat.id, "No need so shy... Everybody needs help one.")
-    bot.send_message(message.chat.id, "Come I tell you again:\n/add to add a new budget... any number also can\n/spend to track when you spend, but don't anyhow spam this one! later your money gone\n/view to view your spending - hopefully got no negatives ah\n/delete help you remove category... spend less save more\n/settings allow you switch between weekly and monthly tracking... very useful de!")
+    bot.send_message(message.chat.id, "Come I tell you again:\n/add to add a new budget... any number also can\n/spend to track when you spend, but don't anyhow spam this one! later your money gone\n/view to view your spending - hopefully got no negatives ah\n/delete help you remove category... spend less save more\n/settings allow you switch between weekly and monthly tracking... very useful de!\nreset to manually reset your budget ba")
     bot.send_message(message.chat.id, "Still need help ah? Okay lor bopes... go find @elyssatanxy help you ba.")
 
 
@@ -229,7 +229,8 @@ def monthly_job(message):
     flag = c.execute("SELECT update_monthly FROM budget where username = %s", (username,))
 
     if flag == True and date.today().day == 1:
-        bot.send_message("New month liao. It's time to /reset!")
+        c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, username))
+        bot.send_message("New month new budget! I have reset all your budgets already!")
 
 
 
@@ -237,13 +238,15 @@ def weekly_job(message):
     username = message.from_user.id
     username = str(username)
     flag = c.execute("SELECT update_monthly FROM budget where username = %s", (username,))
+    spend = 0
 
     if flag == False:
-        bot.send_messaage("Time really flies... Monday blues begin again... Time for you to /reset your budget again.")
+        c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, username))
+        bot.send_messaage("Time really flies... Monday blues again... I make it less blue by resetting your budget ba.")
 
 
 schedule.every().day.at("00:00").do(monthly_job)
-schedule.every().monday.at("00:00").do(weekly_job)
+schedule.every().monday.at("00:03").do(weekly_job)
 
 
 @bot.message_handler(commands=['delete'])
