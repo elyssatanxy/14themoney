@@ -50,10 +50,10 @@ def process_settings(message):
     username = message.from_user.id
     msg = message.text.upper()
     if msg in "W":
-        c.execute("UPDATE budget SET update_monthly = False WHERE username = %s", (username))
+        c.execute("UPDATE budget SET update_monthly = False WHERE username = %s", (username,))
         bot.reply_to(message, "Swee! I help you change to weekly tracking liao.")
     elif msg in "M":
-        c.execute("UPDATE budget SET update_monthly = True WHERE username = %s", (username))
+        c.execute("UPDATE budget SET update_monthly = True WHERE username = %s", (username,))
         bot.reply_to(message, "Solid ah, I change to monthly tracking for you le.")
     else:
         bot.reply_to(message, "Dont play play leh, I give you 2 options only...")
@@ -209,10 +209,14 @@ def process_reset(message):
 
     try:
         c.execute("UPDATE budget SET spend = %s WHERE category_name = %s and username = %s", (spend, category, username))
+        
+        c.execute("SELECT budget FROM budget WHERE category_name = %s AND username = %s", (category, username))
+        budget = c.fetchone()[0]
+        bot.reply_to(message, f"Done. Your budget reset to ${budget} already!")
+        
         conn.commit()
         c.execute("rollback")
         conn.close
-        bot.reply_to(message, f"Done. Your budget reset to ${budget} already!")
     except TypeError:
         bot.reply_to(message, "Hmm... cannot find the category leh. You /add already anot?")
         c.execute("rollback")
