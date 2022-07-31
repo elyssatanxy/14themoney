@@ -35,7 +35,7 @@ def welcome_message(message):
 @bot.message_handler(commands=['help'])
 def help_message(message):
     bot.send_message(message.chat.id, "No need so shy... Everybody needs help one.")
-    bot.send_message(message.chat.id, "Come I tell you again:\n/add to add a new budget... any number also can\n/spend to track when you spend, but don't anyhow spam this one! later your money gone\n/view to view your spending - hopefully got no negatives ah\n/delete help you remove category... spend less save more\n/settings allow you switch between weekly and monthly tracking... very useful de!\nreset to manually reset your budget ba")
+    bot.send_message(message.chat.id, "Come I tell you again:\n/add to add a new budget... any number also can\n/spend to track when you spend, but don't anyhow spam this one! later your money gone\n/view to view your spending - hopefully got no negatives ah\n/delete help you remove category... spend less save more\n/settings allow you switch between weekly and monthly tracking... very useful de!\n/reset to manually reset your budget ba")
     bot.send_message(message.chat.id, "Still need help ah? Okay lor bopes... go find @elyssatanxy help you ba.")
 
 
