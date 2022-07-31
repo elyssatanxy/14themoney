@@ -245,8 +245,8 @@ def weekly_job(message):
         bot.send_messaage("Time really flies... Monday blues again... I make it less blue by resetting your budget ba.")
 
 
-schedule.every().day.at("00:00").do(monthly_job)
-schedule.every().monday.at("00:03").do(weekly_job)
+schedule.every().day.at("00:07").do(monthly_job)
+schedule.every().monday.at("00:04").do(weekly_job)
 
 
 @bot.message_handler(commands=['delete'])
