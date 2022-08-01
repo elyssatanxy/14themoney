@@ -226,7 +226,8 @@ def process_reset(message):
 
 
 def monthly_job(): 
-    c.execute("SELECT username FROM budget where update_monthly = TRUE")
+    flag = True
+    c.execute("SELECT username FROM budget where update_monthly = %s", (flag,))
     user_list = c.fetchall()
 
     for user in user_list:
@@ -242,8 +243,10 @@ def monthly_job():
 
 
 def weekly_job():
-    c.execute("SELECT username FROM budget where update_monthly = FALSE")
+    flag = False
+    c.execute("SELECT username FROM budget where update_monthly = %s", (flag,))
     user_list = c.fetchall()
+    print(user_list)
 
     for user in user_list:
         user = str(user)
@@ -282,7 +285,7 @@ def schedule_checker():
 
 if __name__ == '__main__':
     schedule.every().day.at("00:09").do(monthly_job)
-    schedule.every().tuesday.at("00:19").do(weekly_job)
+    schedule.every().tuesday.at("00:22").do(weekly_job)
     Thread(target=schedule_checker).start() 
 
     bot.infinity_polling()
