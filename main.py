@@ -240,7 +240,7 @@ def monthly_job():
             c.execute("rollback")
             conn.close
 
-            bot.send_message(user, "New month new budget! I have reset all your budgets already!")
+            return bot.send_message(user, "New month new budget! I have reset all your budgets already!")
 
 
 @bot.message_handler(func=lambda message: False)
@@ -257,7 +257,7 @@ def weekly_job():
         c.execute("rollback")
         conn.close
 
-        bot.send_messaage(user, "Time really flies... Monday blues again... I make it less blue by resetting your budget ba.")
+        return bot.send_messaage(user, "Time really flies... Monday blues again... I make it less blue by resetting your budget ba.")
 
 
 @bot.message_handler(commands=['delete'])
@@ -286,7 +286,7 @@ def schedule_checker():
 
 if __name__ == '__main__':
     schedule.every().day.at("00:09").do(monthly_job)
-    schedule.every().tuesday.at("00:35").do(weekly_job)
+    schedule.every().tuesday.at("00:38").do(weekly_job)
     Thread(target=schedule_checker).start() 
 
     bot.infinity_polling()
