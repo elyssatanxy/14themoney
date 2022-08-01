@@ -225,7 +225,7 @@ def process_reset(message):
         c.execute("rollback")
 
 
-@bot.message_handler(func=lambda message: True)
+@bot.message_handler(func=lambda message: False)
 def monthly_job(): 
     flag = True
     c.execute("SELECT username FROM budget where update_monthly = %s", (flag,))
@@ -243,7 +243,7 @@ def monthly_job():
             bot.send_message(user, "New month new budget! I have reset all your budgets already!")
 
 
-@bot.message_handler(func=lambda message: True)
+@bot.message_handler(func=lambda message: False)
 def weekly_job():
     flag = False
     c.execute("SELECT username FROM budget where update_monthly = %s", (flag,))
@@ -286,7 +286,7 @@ def schedule_checker():
 
 if __name__ == '__main__':
     schedule.every().day.at("00:09").do(monthly_job)
-    schedule.every().tuesday.at("00:22").do(weekly_job)
+    schedule.every().tuesday.at("00:35").do(weekly_job)
     Thread(target=schedule_checker).start() 
 
     bot.infinity_polling()
