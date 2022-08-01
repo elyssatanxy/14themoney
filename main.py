@@ -229,7 +229,6 @@ def process_reset(message):
         c.execute("rollback")
 
 
-# @bot.message_handler(func=lambda message: False)
 # def monthly_job(message): 
 #     username = message.from_user.id
 #     username = str(username)
@@ -276,11 +275,17 @@ def process_delete(message):
     username = str(username)
     msg = message.text
 
-    c.execute("DELETE FROM budget WHERE category_name = %s AND username = %s", (msg, username))
+    # c.execute("DELETE FROM budget WHERE category_name = %s AND username = %s", (msg, username))
+    flag = False
+    c.execute("SELECT username FROM budget where update_monthly = %s", (flag,))
+    user_list = c.fetchall()
+    names = ""
+    for user in user_list:
+        names += user
     conn.commit()
     c.execute("rollback")
     conn.close
-    bot.reply_to(message, "Can liao, delete for you already.")
+    bot.reply_to(message, f"Can liao, delete for you already. {names}")
 
 
 def schedule_checker():
@@ -291,6 +296,5 @@ def schedule_checker():
 
 if __name__ == '__main__':
     bot.infinity_polling()
-    # schedule.every().day.at("00:09").do(monthly_job)
     sched.add_job(weekly_job, trigger="cron", day_of_week="tue", hour=1, minute=2)
     sched.start()
