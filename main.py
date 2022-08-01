@@ -243,14 +243,14 @@ def process_reset(message):
 #             c.execute("rollback")
 #             conn.close
 
-#             return bot.send_message(user, "New month new budget! I have reset all your budgets already!")
+#             return bot.send_message(message.chat.id, "New month new budget! I have reset all your budgets already!")
 
 
 @bot.message_handler(func=lambda message: False)
 def weekly_job(message):
-    flag = False
-    c.execute("SELECT username FROM budget where update_monthly = %s", (flag,))
-    user_list = c.fetchall()
+    # flag = False
+    # c.execute("SELECT username FROM budget where update_monthly = %s", (flag,))
+    # user_list = c.fetchall()
 
     return bot.send_messaage(message.chat.id, "Time really flies... Monday blues again... I make it less blue by resetting your budget ba.")
 
@@ -261,8 +261,6 @@ def weekly_job(message):
         conn.commit()
         c.execute("rollback")
         conn.close
-
-        return bot.send_messaage(user, "Time really flies... Monday blues again... I make it less blue by resetting your budget ba.")
 
 
 @bot.message_handler(commands=['delete'])
@@ -290,8 +288,7 @@ def schedule_checker():
 
 
 if __name__ == '__main__':
+    bot.infinity_polling()
     # schedule.every().day.at("00:09").do(monthly_job)
     schedule.every().tuesday.at("00:47").do(weekly_job)
     Thread(target=schedule_checker).start() 
-
-    bot.infinity_polling()
