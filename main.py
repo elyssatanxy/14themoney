@@ -254,7 +254,8 @@ def weekly_job():
     c.execute("SELECT username FROM budget where update_monthly = %s", (flag,))
     user_list = c.fetchall()
 
-    for user in user_list:
+    for row in user_list:
+        user = row[0]
         user = str(user)
         spend = 0
         c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, user))
@@ -280,7 +281,8 @@ def process_delete(message):
     c.execute("SELECT username FROM budget where update_monthly = %s", (flag,))
     user_list = c.fetchall()
     names = ""
-    for user in user_list:
+    for row in user_list:
+        user = row[0]
         names += user
     conn.commit()
     c.execute("rollback")
@@ -296,5 +298,5 @@ def schedule_checker():
 
 if __name__ == '__main__':
     bot.infinity_polling()
-    sched.add_job(weekly_job, trigger="cron", day_of_week="tue", hour=1, minute=2)
+    sched.add_job(weekly_job, trigger="cron", day_of_week="tue", hour=1, minute=10)
     sched.start()
