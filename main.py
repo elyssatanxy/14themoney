@@ -10,7 +10,6 @@ import os
 import urllib.parse as urlparse
 from datetime import date
 import schedule
-from apscheduler.schedulers.blocking import BlockingScheduler
 
 url = urlparse.urlparse(os.environ['DATABASE_URL'])
 dbname = url.path[1:]
@@ -18,8 +17,6 @@ user = url.username
 password = url.password
 host = url.hostname
 port = url.port
-
-sched = BlockingScheduler()
 
 bot = telebot.TeleBot(token=keys.API_KEY)
 conn = psycopg2.connect(
@@ -251,7 +248,7 @@ def process_reset(message):
 
 def weekly_job():
     flag = False
-    c.execute("SELECT username FROM budget where update_monthly = %s", (flag,))
+    c.execute("SELECT DISTINCT username FROM budget where update_monthly = %s", (flag,))
     user_list = c.fetchall()
 
     for row in user_list:
@@ -278,7 +275,7 @@ def process_delete(message):
 
     # c.execute("DELETE FROM budget WHERE category_name = %s AND username = %s", (msg, username))
     flag = False
-    c.execute("SELECT username FROM budget where update_monthly = %s", (flag,))
+    c.execute("SELECT DISTINCT username FROM budget where update_monthly = %s", (flag,))
     user_list = c.fetchall()
     names = ""
     for row in user_list:
@@ -288,7 +285,7 @@ def process_delete(message):
     conn.commit()
     c.execute("rollback")
     conn.close
-    #bot.reply_to(message, f"Can liao, delete for you already. {names}")
+    #bot.reply_to(message, "Can liao, delete for you already.")
 
 
 def schedule_checker():
@@ -298,6 +295,6 @@ def schedule_checker():
 
 
 if __name__ == '__main__':
+    schedule.every().tuesday.at("01:17").do(weekly_job)
+    Thread(target=schedule_checker).start() 
     bot.infinity_polling()
-    sched.add_job(weekly_job, trigger="cron", day_of_week="tue", hour=1, minute=12)
-    sched.start()
