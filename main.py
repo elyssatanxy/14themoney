@@ -225,6 +225,7 @@ def process_reset(message):
         c.execute("rollback")
 
 
+@bot.message_handler(func=lambda message: True)
 def monthly_job(): 
     flag = True
     c.execute("SELECT username FROM budget where update_monthly = %s", (flag,))
@@ -242,11 +243,11 @@ def monthly_job():
             bot.send_message(user, "New month new budget! I have reset all your budgets already!")
 
 
+@bot.message_handler(func=lambda message: True)
 def weekly_job():
     flag = False
     c.execute("SELECT username FROM budget where update_monthly = %s", (flag,))
     user_list = c.fetchall()
-    print(user_list)
 
     for user in user_list:
         user = str(user)
