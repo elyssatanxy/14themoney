@@ -290,5 +290,5 @@ def schedule_checker():
 if __name__ == '__main__':
     bot.infinity_polling()
     # schedule.every().day.at("00:09").do(monthly_job)
-    schedule.every().tuesday.at("00:47").do(weekly_job)
+    schedule.every().tuesday.at("00:53").do(weekly_job)
     Thread(target=schedule_checker).start() 
