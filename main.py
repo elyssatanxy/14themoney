@@ -225,32 +225,25 @@ def process_reset(message):
         c.execute("rollback")
 
 
-@bot.message_handler(func=lambda m: True)
-def monthly_job(message): 
-    username = message.from_user.id
-    username = str(username)
-    c.execute("SELECT update_monthly FROM budget where username = %s", (username,))
-    flag = c.fetchone()[0]
+def monthly_job(): 
+    c.execute("SELECT username FROM budget where update_monthly = TRUE")
+    user_list = c.fetchall()
 
-    if flag == True and date.today().day == 1:
-        c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, username))
-        bot.send_message("New month new budget! I have reset all your budgets already!")
-        conn.commit()
-        c.execute("rollback")
-        conn.close
+    for user in user_list:
+        if date.today().day == 1:
+            c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, user))
+            bot.send_message("New month new budget! I have reset all your budgets already!")
+            conn.commit()
+            c.execute("rollback")
+            conn.close
 
 
-@bot.message_handler(func=lambda m: True)
-def weekly_job(message):
-    username = message.from_user.id
-    username = str(username)
-    c.execute("SELECT update_monthly FROM budget where username = %s", (username,))
-    flag = c.fetchone()[0]
-    
-    spend = 0
+def weekly_job():
+    c.execute("SELECT username FROM budget where update_monthly = FALSE")
+    user_list = c.fetchall()
 
-    if flag == False:
-        c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, username))
+    for user in user_list:
+        c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, user))
         bot.send_messaage("Time really flies... Monday blues again... I make it less blue by resetting your budget ba.")
         conn.commit()
         c.execute("rollback")
@@ -284,6 +277,6 @@ def schedule_checker():
 if __name__ == '__main__':
     bot.infinity_polling()
     schedule.every().day.at("00:09").do(monthly_job)
-    schedule.every().monday.at("04:00").do(weekly_job)
+    schedule.every().tuesday.at("00:11").do(weekly_job)
     Thread(target=schedule_checker).start() 
     schedule()
