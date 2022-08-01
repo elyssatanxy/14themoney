@@ -1,5 +1,6 @@
 import decimal
 from math import remainder
+import sched
 from threading import Thread
 from time import sleep
 import telebot
@@ -9,6 +10,7 @@ import os
 import urllib.parse as urlparse
 from datetime import date
 import schedule
+from apscheduler.schedulers.blocking import BlockingScheduler
 
 url = urlparse.urlparse(os.environ['DATABASE_URL'])
 dbname = url.path[1:]
@@ -16,6 +18,8 @@ user = url.username
 password = url.password
 host = url.hostname
 port = url.port
+
+sched = BlockingScheduler()
 
 bot = telebot.TeleBot(token=keys.API_KEY)
 conn = psycopg2.connect(
@@ -246,13 +250,10 @@ def process_reset(message):
 #             return bot.send_message(message.chat.id, "New month new budget! I have reset all your budgets already!")
 
 
-@bot.message_handler(func=lambda message: False)
-def weekly_job(message):
-    # flag = False
-    # c.execute("SELECT username FROM budget where update_monthly = %s", (flag,))
-    # user_list = c.fetchall()
-
-    return bot.send_messaage(message.chat.id, "Time really flies... Monday blues again... I make it less blue by resetting your budget ba.")
+def weekly_job():
+    flag = False
+    c.execute("SELECT username FROM budget where update_monthly = %s", (flag,))
+    user_list = c.fetchall()
 
     for user in user_list:
         user = str(user)
@@ -261,6 +262,7 @@ def weekly_job(message):
         conn.commit()
         c.execute("rollback")
         conn.close
+        bot.send_messaage(user, "Time really flies... Monday blues again... I make it less blue by resetting your budget ba.")
 
 
 @bot.message_handler(commands=['delete'])
@@ -290,5 +292,4 @@ def schedule_checker():
 if __name__ == '__main__':
     bot.infinity_polling()
     # schedule.every().day.at("00:09").do(monthly_job)
-    schedule.every().tuesday.at("00:53").do(weekly_job)
-    Thread(target=schedule_checker).start() 
+    sched.add_job(weekly_job, trigger="cron", day_of_week="tue", hour=1, minute=2)
