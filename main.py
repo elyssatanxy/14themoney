@@ -231,8 +231,9 @@ def monthly_job():
 
     for user in user_list:
         if date.today().day == 1:
+            user = str(user)
             c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, user))
-            bot.send_message("New month new budget! I have reset all your budgets already!")
+            bot.send_message(user, "New month new budget! I have reset all your budgets already!")
             conn.commit()
             c.execute("rollback")
             conn.close
@@ -243,8 +244,9 @@ def weekly_job():
     user_list = c.fetchall()
 
     for user in user_list:
+        user = str(user)
         c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, user))
-        bot.send_messaage("Time really flies... Monday blues again... I make it less blue by resetting your budget ba.")
+        bot.send_messaage(user, "Time really flies... Monday blues again... I make it less blue by resetting your budget ba.")
         conn.commit()
         c.execute("rollback")
         conn.close
@@ -277,6 +279,6 @@ def schedule_checker():
 if __name__ == '__main__':
     bot.infinity_polling()
     schedule.every().day.at("00:09").do(monthly_job)
-    schedule.every().tuesday.at("00:11").do(weekly_job)
+    schedule.every().tuesday.at("00:15").do(weekly_job)
     Thread(target=schedule_checker).start() 
     schedule()
