@@ -225,29 +225,34 @@ def process_reset(message):
         c.execute("rollback")
 
 
+# @bot.message_handler(func=lambda message: False)
+# def monthly_job(message): 
+#     username = message.from_user.id
+#     username = str(username)
+#     c.execute("SELECT update_monthly FROM budget WHERE username = %s", (username,))
+#     flag = c.fetchone()[0]
+
+#     if flag == True: 
+
+#     for user in user_list:
+#         if date.today().day == 1:
+#             user = str(user)
+#             spend = 0
+#             c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, user))
+#             conn.commit()
+#             c.execute("rollback")
+#             conn.close
+
+#             return bot.send_message(user, "New month new budget! I have reset all your budgets already!")
+
+
 @bot.message_handler(func=lambda message: False)
-def monthly_job(): 
-    flag = True
-    c.execute("SELECT username FROM budget where update_monthly = %s", (flag,))
-    user_list = c.fetchall()
-
-    for user in user_list:
-        if date.today().day == 1:
-            user = str(user)
-            spend = 0
-            c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, user))
-            conn.commit()
-            c.execute("rollback")
-            conn.close
-
-            return bot.send_message(user, "New month new budget! I have reset all your budgets already!")
-
-
-@bot.message_handler(func=lambda message: False)
-def weekly_job():
+def weekly_job(message):
     flag = False
     c.execute("SELECT username FROM budget where update_monthly = %s", (flag,))
     user_list = c.fetchall()
+
+    return bot.send_messaage(message.chat.id, "Time really flies... Monday blues again... I make it less blue by resetting your budget ba.")
 
     for user in user_list:
         user = str(user)
@@ -285,8 +290,8 @@ def schedule_checker():
 
 
 if __name__ == '__main__':
-    schedule.every().day.at("00:09").do(monthly_job)
-    schedule.every().tuesday.at("00:38").do(weekly_job)
+    # schedule.every().day.at("00:09").do(monthly_job)
+    schedule.every().tuesday.at("00:47").do(weekly_job)
     Thread(target=schedule_checker).start() 
 
     bot.infinity_polling()
