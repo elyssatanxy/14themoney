@@ -293,3 +293,4 @@ if __name__ == '__main__':
     bot.infinity_polling()
     # schedule.every().day.at("00:09").do(monthly_job)
     sched.add_job(weekly_job, trigger="cron", day_of_week="tue", hour=1, minute=2)
+    sched.start()
