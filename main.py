@@ -1,6 +1,5 @@
 import decimal
 from math import remainder
-import sched
 from threading import Thread
 from time import sleep
 import telebot
@@ -259,7 +258,7 @@ def weekly_job():
         conn.commit()
         c.execute("rollback")
         conn.close
-        bot.send_messaage(user, "Time really flies... Monday blues again... I make it less blue by resetting your budget ba.")
+        return bot.send_messaage(user, "Alamak Monday blues again... I make it less blue by resetting your budget ba.")
 
 
 @bot.message_handler(commands=['delete'])
@@ -273,28 +272,16 @@ def process_delete(message):
     username = str(username)
     msg = message.text
 
-    # c.execute("DELETE FROM budget WHERE category_name = %s AND username = %s", (msg, username))
-    flag = False
-    c.execute("SELECT DISTINCT username FROM budget where update_monthly = %s", (flag,))
-    user_list = c.fetchall()
-    names = ""
-    for row in user_list:
-        user = row[0]
-        names += user
-        bot.send_message(user, "hi")
+    c.execute("DELETE FROM budget WHERE category_name = %s AND username = %s", (msg, username))
     conn.commit()
     c.execute("rollback")
     conn.close
-    #bot.reply_to(message, "Can liao, delete for you already.")
-
-
-def schedule_checker():
-    while True:
-        schedule.run_pending()
-        sleep(1)
+    bot.reply_to(message, "Can liao, delete for you already.")
 
 
 if __name__ == '__main__':
-    schedule.every().tuesday.at("01:17").do(weekly_job)
-    Thread(target=schedule_checker).start() 
-    bot.infinity_polling()
+    schedule.every().thursday.at("22:55").do(weekly_job)
+    while True:
+        bot.infinity_polling()
+        schedule.run_pending()
+        sleep(1)
