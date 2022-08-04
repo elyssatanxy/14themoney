@@ -1,31 +1,50 @@
 import decimal
 from math import remainder
-from threading import Thread
-from time import sleep
 import telebot
 import Constants as keys
 import psycopg2
 import os
 import urllib.parse as urlparse
 from datetime import date
-import schedule
+from flask import Flask, request
 
-url = urlparse.urlparse(os.environ['DATABASE_URL'])
-dbname = url.path[1:]
-user = url.username
-password = url.password
-host = url.hostname
-port = url.port
+server = Flask(__name__) 
+
+# url = urlparse.urlparse(os.environ['DATABASE_URL'])
+# dbname = url.path[1:]
+# user = url.username
+# password = url.password
+# host = url.hostname
+# port = url.port
 
 bot = telebot.TeleBot(token=keys.API_KEY)
+# conn = psycopg2.connect(
+#     dbname=dbname,
+#     user=user,
+#     password=password,
+#     host=host,
+#     port=port
+# )
 conn = psycopg2.connect(
-    dbname=dbname,
-    user=user,
-    password=password,
-    host=host,
-    port=port
+    dbname="d4dek650nulj0j",
+    user="omehwxpztoyhcb",
+    password="f2630cbdf7bc87daa8cf13ec7d3f81baeadde14438d03a8f01e5c6b01b22ca60",
+    host="ec2-34-235-31-124.compute-1.amazonaws.com",
+    port="5432"
 )
 c = conn.cursor()
+
+@server.route('/' + keys.API_KEY, methods=['POST'])
+def getMessage():
+    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+    return "!", 200
+
+
+@server.route("/")
+def webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url='https://fourteenthemoney.herokuapp.com/' + keys.API_KEY)
+    return "!", 200
 
 
 @bot.message_handler(commands=['start'])
@@ -280,4 +299,4 @@ def process_delete(message):
 
 
 if __name__ == '__main__':
-    bot.infinity_polling()
+    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5432)))
