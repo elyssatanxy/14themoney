@@ -1,2 +1,1 @@
-worker: python3 main.py
-worker: python3 test.py
+worker: python3 main.py & python3 test.py & wait -n

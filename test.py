@@ -53,7 +53,7 @@ def test_job():
 
 
 if __name__ == '__main__':
-    schedule.every().thursday.at("00:34").do(test_job)
+    schedule.every().thursday.at("00:36").do(test_job)
 
     while True:
         schedule.run_pending()
