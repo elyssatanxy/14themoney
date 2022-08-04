@@ -255,10 +255,11 @@ def weekly_job():
         user = str(user)
         spend = 0
         c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, user))
+        bot.send_messaage(user, "Alamak Monday blues again... I make it less blue by resetting your budget ba.")
+        
         conn.commit()
         c.execute("rollback")
         conn.close
-        return bot.send_messaage(user, "Alamak Monday blues again... I make it less blue by resetting your budget ba.")
 
 
 @bot.message_handler(commands=['delete'])
