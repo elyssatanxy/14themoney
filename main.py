@@ -82,10 +82,11 @@ def view(message):
         if row[2] < 0:
             negativeflag = True
 
+    bot.send_message(message.chat.id, all)
+
     conn.commit()
     c.execute("rollback")
     conn.close
-    bot.send_message(message.chat.id, all)
 
     if negativeflag:
         bot.send_message(message.chat.id, "Aiya you overspend liao. Stop it ah!")
@@ -252,9 +253,8 @@ def weekly_job():
 
     for row in user_list:
         user = row[0]
-        spend = 0
-        c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, user))
-        bot.send_messaage(user, "Alamak Monday blues again... I make it less blue by resetting your budget ba.")
+        c.execute("UPDATE budget SET spend = 0 WHERE username = %s", (user,))
+        bot.send_message(user, "Alamak Monday blues again... I make it less blue by resetting your budget ba.")
         
         conn.commit()
         c.execute("rollback")
@@ -273,14 +273,14 @@ def process_delete(message):
     msg = message.text
 
     c.execute("DELETE FROM budget WHERE category_name = %s AND username = %s", (msg, username))
+    bot.reply_to(message, "Can liao, delete for you already.")
     conn.commit()
     c.execute("rollback")
     conn.close
-    bot.reply_to(message, "Can liao, delete for you already.")
 
 
 if __name__ == '__main__':
-    schedule.every().thursday.at("23:04").do(weekly_job)
+    schedule.every().thursday.at("23:22").do(weekly_job)
     while True:
         bot.infinity_polling()
         schedule.run_pending()
