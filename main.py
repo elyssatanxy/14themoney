@@ -253,7 +253,8 @@ def weekly_job():
 
     for row in user_list:
         user = row[0]
-        c.execute("UPDATE budget SET spend = 0 WHERE username = %s", (user,))
+        spend = 0
+        c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, user))
         bot.send_message(user, "Alamak Monday blues again... I make it less blue by resetting your budget ba.")
         
         conn.commit()
@@ -282,6 +283,6 @@ def process_delete(message):
 if __name__ == '__main__':
     schedule.every().thursday.at("23:22").do(weekly_job)
     while True:
-        bot.infinity_polling()
         schedule.run_pending()
         sleep(1)
+        bot.infinity_polling()
