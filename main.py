@@ -283,7 +283,7 @@ def process_delete(message):
 
 
 if __name__ == '__main__':
-    schedule.every().thursday.at("23:50").do(weekly_job)
+    schedule.every().thursday.at("23:53").do(weekly_job)
     while True:
         schedule.run_pending()
         sleep(1)
