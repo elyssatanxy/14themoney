@@ -9,7 +9,6 @@ import os
 import urllib.parse as urlparse
 from datetime import date
 import schedule
-import test as jobs
 
 url = urlparse.urlparse(os.environ['DATABASE_URL'])
 dbname = url.path[1:]
@@ -282,7 +281,3 @@ def process_delete(message):
 
 if __name__ == '__main__':
     bot.infinity_polling()
-    schedule.every().thursday.at("23:58").do(weekly_job)
-    while True:
-        schedule.run_pending()
-        sleep(1)
