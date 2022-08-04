@@ -287,3 +287,4 @@ if __name__ == '__main__':
     while True:
         schedule.run_pending()
         sleep(1)
+        bot.infinity_polling()
