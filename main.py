@@ -256,7 +256,7 @@ def weekly_job():
         spend = 0
         c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, user))
         bot.send_message(user, "Alamak Monday blues again... I make it less blue by resetting your budget ba.")
-        
+
         conn.commit()
         c.execute("rollback")
         conn.close
@@ -281,7 +281,7 @@ def process_delete(message):
 
 
 if __name__ == '__main__':
-    schedule.every().thursday.at("23:22").do(weekly_job)
+    schedule.every().thursday.at("23:29").do(weekly_job)
     while True:
         schedule.run_pending()
         sleep(1)
