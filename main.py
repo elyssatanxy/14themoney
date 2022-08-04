@@ -281,8 +281,7 @@ def process_delete(message):
 
 
 if __name__ == '__main__':
-    schedule.every().thursday.at("23:29").do(weekly_job)
+    schedule.every().thursday.at("23:42").do(weekly_job)
     while True:
         schedule.run_pending()
         sleep(1)
-        bot.infinity_polling()
