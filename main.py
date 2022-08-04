@@ -227,24 +227,22 @@ def process_reset(message):
         c.execute("rollback")
 
 
-# def monthly_job(message): 
-#     username = message.from_user.id
-#     username = str(username)
-#     c.execute("SELECT update_monthly FROM budget WHERE username = %s", (username,))
-#     flag = c.fetchone()[0]
+def monthly_job():
+    flag = True
+    c.execute("SELECT DISTINCT username FROM budget where update_monthly = %s", (flag,))
+    user_list = c.fetchall()
 
-#     if flag == True: 
+    for row in user_list:
+        if date.today().day == 1:
+            user = row[0]
+            spend = 0
 
-#     for user in user_list:
-#         if date.today().day == 1:
-#             user = str(user)
-#             spend = 0
-#             c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, user))
-#             conn.commit()
-#             c.execute("rollback")
-#             conn.close
+            c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, user))
+            bot.send_message(user, "New month new budget! I have reset all your budgets already!")
 
-#             return bot.send_message(message.chat.id, "New month new budget! I have reset all your budgets already!")
+            conn.commit()
+            c.execute("rollback")
+            conn.close
 
 
 def weekly_job():
@@ -283,8 +281,8 @@ def process_delete(message):
 
 
 if __name__ == '__main__':
-    schedule.every().thursday.at("23:53").do(weekly_job)
+    bot.infinity_polling()
+    schedule.every().thursday.at("23:58").do(weekly_job)
     while True:
         schedule.run_pending()
         sleep(1)
-        bot.infinity_polling()
