@@ -9,6 +9,7 @@ import os
 import urllib.parse as urlparse
 from datetime import date
 import schedule
+import test as jobs
 
 url = urlparse.urlparse(os.environ['DATABASE_URL'])
 dbname = url.path[1:]
@@ -254,6 +255,7 @@ def weekly_job():
     for row in user_list:
         user = row[0]
         spend = 0
+
         c.execute("UPDATE budget SET spend = %s WHERE username = %s", (spend, user))
         bot.send_message(user, "Alamak Monday blues again... I make it less blue by resetting your budget ba.")
 
@@ -281,7 +283,7 @@ def process_delete(message):
 
 
 if __name__ == '__main__':
-    schedule.every().thursday.at("23:42").do(weekly_job)
+    schedule.every().thursday.at("23:48").do(weekly_job)
     while True:
         schedule.run_pending()
         sleep(1)
