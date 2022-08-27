@@ -75,10 +75,12 @@ def view(message):
 
     for row in user_budgets:
         remainder = row[2] - row[3]
+        if remainder < 0:
+            negativeFlag = True
+            all += f"{list}. Overspent by {-1 * remainder} on {row[1]} liao!\n"
         all += f"{list}. Left ${remainder} for {row[1]}\n"
         list += 1
-        if row[2] < 0:
-            negativeflag = True
+
 
     bot.send_message(message.chat.id, all)
 
@@ -183,7 +185,7 @@ def process_spending(message):
         remainder = budget - spend
         bot.reply_to(message, f"Wah so much ah? Siao liao... Rest of the month eat grass liao lor. Spent ${spend}, so now left ${remainder} for {category}.")
 
-        if budget <= 0:
+        if remainder <= 0:
             bot.reply_to(message, "How can liddat... Next time no money buy house lor. Die liao.")
 
         conn.commit()
