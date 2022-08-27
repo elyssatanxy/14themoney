@@ -76,11 +76,12 @@ def view(message):
     for row in user_budgets:
         remainder = row[2] - row[3]
         if remainder < 0:
-            negativeFlag = True
+            negativeflag = True
             all += f"{list}. Overspent by {-1 * remainder} on {row[1]} liao!\n"
-        all += f"{list}. Left ${remainder} for {row[1]}\n"
-        list += 1
+        else:
+            all += f"{list}. Left ${remainder} for {row[1]}\n"
 
+        list += 1
 
     bot.send_message(message.chat.id, all)
 
