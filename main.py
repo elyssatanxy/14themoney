@@ -113,7 +113,7 @@ def process_budget(message):
         try:
             separated = line.split("-")
             global category
-            category = separated[0]
+            category = separated[0].lower()
             global budget
             budget = float(separated[1])
             spend = 0
@@ -173,7 +173,7 @@ def process_spending(message):
 
     try:
         separated = msg.split("-")
-        category = separated[0]
+        category = separated[0].lower()
         spend = decimal.Decimal(separated[1])
 
         c.execute("SELECT spend FROM budget WHERE category_name = %s AND username = %s", (category, username))
@@ -188,6 +188,9 @@ def process_spending(message):
 
         if remainder <= 0:
             bot.reply_to(message, "How can liddat... Next time no money buy house lor. Die liao.")
+
+        if spend <= 5: 
+            bot.reply_to(message, "Wah ups eh! Spend so little!")
 
         conn.commit()
         c.execute("rollback")
