@@ -77,7 +77,7 @@ def view(message):
         remainder = row[2] - row[3]
         if remainder < 0:
             negativeflag = True
-            all += f"{list}. Overspent by {-1 * remainder} on {row[1]} liao!\n"
+            all += f"{list}. Overspent by ${-1 * remainder} on {row[1]} liao!\n"
         else:
             all += f"{list}. Left ${remainder} for {row[1]}\n"
 
@@ -285,3 +285,8 @@ def process_delete(message):
 
 if __name__ == '__main__':
     bot.infinity_polling()
+
+    # current issues: typing negative numbers into spend
+    # features to add:
+    # 1. update budget
+
