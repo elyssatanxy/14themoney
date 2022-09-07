@@ -184,13 +184,13 @@ def process_spending(message):
         c.execute("SELECT budget FROM budget WHERE category_name = %s AND username = %s", (category, username))
         budget = c.fetchone()[0]
         remainder = budget - spend
-        bot.reply_to(message, f"Wah so much ah? Siao liao... Rest of the month eat grass liao lor. Spent ${spend}, so now left ${remainder} for {category}.")
+        if spend <= 5:
+            bot.reply_to(message, f"Wah ups eh! Spend so little ah? Spent ${spend}, so now left ${remainder} for {category}.")
+        else:
+            bot.reply_to(message, f"Wah so much ah? Siao liao... Rest of the month eat grass liao lor. Spent ${spend}, so now left ${remainder} for {category}.")
 
         if remainder <= 0:
             bot.reply_to(message, "How can liddat... Next time no money buy house lor. Die liao.")
-
-        if spend <= 5: 
-            bot.reply_to(message, "Wah ups eh! Spend so little!")
 
         conn.commit()
         c.execute("rollback")
