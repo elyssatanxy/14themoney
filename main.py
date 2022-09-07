@@ -175,6 +175,10 @@ def process_spending(message):
         separated = msg.split("-")
         category = separated[0].lower()
         spend = decimal.Decimal(separated[1])
+        flag = True
+
+        if spend <- 5:
+            flag = False
 
         c.execute("SELECT spend FROM budget WHERE category_name = %s AND username = %s", (category, username))
         spend += c.fetchone()[0]
@@ -184,7 +188,8 @@ def process_spending(message):
         c.execute("SELECT budget FROM budget WHERE category_name = %s AND username = %s", (category, username))
         budget = c.fetchone()[0]
         remainder = budget - spend
-        if spend <= 5:
+
+        if not flag:
             bot.reply_to(message, f"Wah ups eh! Spend so little ah? Spent ${spend}, so now left ${remainder} for {category}.")
         else:
             bot.reply_to(message, f"Wah so much ah? Siao liao... Rest of the month eat grass liao lor. Spent ${spend}, so now left ${remainder} for {category}.")
