@@ -177,7 +177,7 @@ def process_spending(message):
         spend = decimal.Decimal(separated[1])
         flag = True
 
-        if spend <- 5:
+        if spend <= 5:
             flag = False
 
         c.execute("SELECT spend FROM budget WHERE category_name = %s AND username = %s", (category, username))
