@@ -62,6 +62,8 @@ def process_settings(message):
 
 @bot.message_handler(commands=['view'])
 def view(message):
+    c = conn.cursor()
+
     bot.send_message(message.chat.id, "Wah moment of truth...")
 
     username = message.from_user.id
@@ -104,6 +106,8 @@ def add(message):
 
 
 def process_budget(message):
+    c = conn.cursor()
+
     username = message.from_user.id
     username = str(username)
     msg = message.text
@@ -143,6 +147,8 @@ def process_budget(message):
 
 
 def update_budget(message):
+    c = conn.cursor()
+
     msg = message.text.upper()
     if msg in "Y":
         username = message.from_user.id
@@ -167,6 +173,8 @@ def spend(message):
 
 
 def process_spending(message):
+    c = conn.cursor()
+
     username = message.from_user.id
     username = str(username)
     msg = message.text
@@ -218,6 +226,8 @@ def reset(message):
 
 
 def process_reset(message):
+    c = conn.cursor()
+
     username = message.from_user.id
     username = str(username)
     category = message.text
@@ -280,6 +290,8 @@ def delete(message):
 
 
 def process_delete(message):
+    c = conn.cursor()
+    
     username = message.from_user.id
     username = str(username)
     msg = message.text
