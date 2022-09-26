@@ -1,8 +1,7 @@
 # fourteenthemoney
 Try it here: https://t.me/fourteenthemoney_bot
 
-14themoney is an expenses tracking Telegram Bot. Designed with simplicity in mind, the bot's commands are straightforward and allow users to 
-Also my first Telegram Bot, do let me know if there are any improvements I can make. 
+14themoney is an expenses tracking Telegram Bot. 
 
 ### About
 - Built on PostgreSQL database
@@ -20,6 +19,4 @@ Also my first Telegram Bot, do let me know if there are any improvements I can m
 
 
 ### Future Updates
-- Implementation of /settings to allow users to set either monthly or weekly budgets
-- Weekly notifications on how much left in budget
 - Inline keyboard
