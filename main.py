@@ -306,7 +306,3 @@ def process_delete(message):
 if __name__ == '__main__':
     bot.infinity_polling()
 
-    # current issues: typing negative numbers into spend
-    # features to add:
-    # 1. update budget
-
